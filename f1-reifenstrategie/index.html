@@ -7,9 +7,9 @@
 <title>F1 Reifenstrategie – Spielereien</title>
 <meta name="theme-color" content="#171512">
 <meta name="description" content="Animierte, chronologische Übersicht über F1-Reifenmischungen, Streckeneinflüsse und Boxenstopp-Strategien.">
-<link rel="manifest" href="../manifest.json">
-<link rel="icon" href="../icons/favicon.png" type="image/png">
-<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="F1 Reifen">
@@ -158,6 +158,22 @@ body.dark .gauge-needle{border-top-color:var(--accent)}
 .dilemma-card.late{background:linear-gradient(160deg,rgba(224,64,64,.12),var(--bg-card) 60%)}
 .dilemma-title{font-weight:700;font-size:.95rem;margin-bottom:.4rem;display:flex;align-items:center;gap:.4rem}
 .dilemma-desc{font-size:.85rem;color:var(--text-muted)}
+
+/* strategy calculator */
+.calc-box{margin-top:1.8rem;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem 1.5rem;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:1.2rem}
+.calc-field label{display:block;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.5rem}
+.calc-field input[type="text"]{width:100%;padding:.75rem .9rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:.98rem}
+.calc-field input[type="text"]:focus{outline:none;border-color:var(--accent)}
+.weather-toggle{display:flex;gap:.5rem;flex-wrap:wrap}
+.w-btn{font-family:var(--font-body);font-size:.85rem;padding:.6rem 1.1rem;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text-muted);cursor:pointer;transition:all .2s}
+.w-btn:hover{border-color:var(--accent)}
+.w-btn.active{background:var(--accent);border-color:var(--accent);color:#111;font-weight:600}
+.calc-output{margin-top:1.4rem}
+.calc-placeholder{color:var(--text-muted);font-size:.9rem;padding:.4rem 0 0}
+.calc-track-info{font-size:.85rem;color:var(--text);background:var(--accent-light);border-radius:10px;padding:.9rem 1.1rem;margin-bottom:1.1rem}
+.calc-track-info b{color:var(--accent-dark)}
+body.dark .calc-track-info b{color:var(--accent)}
+.calc-badge{display:inline-block;font-size:.62rem;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:.22rem .55rem;border-radius:5px;background:var(--accent);color:#111;margin-left:.6rem;vertical-align:middle}
 
 /* good to know */
 .info-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.9rem;margin-top:1.6rem}
@@ -423,8 +439,37 @@ body.dark footer a{color:var(--accent)}
     </div>
   </section>
 
-  <!-- Bonus: eigenes Wissen -->
+  <!-- Kapitel 7 -->
   <section class="chapter" id="c7">
+    <div class="chapter-head reveal">
+      <div class="chapter-num">Kapitel 7</div>
+      <h2 class="chapter-title">Probier's selbst: der Strategie-Rechner</h2>
+      <p class="chapter-lede">Strecke suchen, Wetter angeben – der Rechner kombiniert den Streckencharakter (Kapitel 4) mit den Mustern aus Kapitel 3 und dem Crossover Point aus Kapitel 6.</p>
+    </div>
+
+    <div class="calc-box reveal">
+      <div class="calc-field">
+        <label for="trackInput">Strecke suchen</label>
+        <input type="text" id="trackInput" list="trackList" placeholder="z. B. Silverstone, Monaco, Suzuka …" autocomplete="off">
+        <datalist id="trackList"></datalist>
+      </div>
+      <div class="calc-field">
+        <label>Wetterlage</label>
+        <div class="weather-toggle" id="weatherToggle">
+          <button type="button" class="w-btn active" data-w="trocken">☀️ Trocken</button>
+          <button type="button" class="w-btn" data-w="wechselhaft">🌦️ Wechselhaft</button>
+          <button type="button" class="w-btn" data-w="nass">🌧️ Dauerregen</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="calcOutput" class="calc-output">
+      <p class="calc-placeholder">Wähle oben eine Strecke aus der Liste – die passenden Strategien erscheinen sofort.</p>
+    </div>
+  </section>
+
+  <!-- Bonus: eigenes Wissen -->
+  <section class="chapter" id="c8">
     <div class="chapter-head reveal">
       <div class="chapter-num">Extra</div>
       <h2 class="chapter-title">Gut zu wissen</h2>
@@ -488,6 +533,152 @@ document.querySelectorAll('.rain-card').forEach(card=>{
     d.style.animationDelay=(Math.random()*2)+'s';
     card.appendChild(d);
   }
+});
+
+/* ---------- Kapitel 7: Strategie-Rechner ---------- */
+/* deg/overtake: 1 = niedrig/schwer … 3 = hoch/leicht. pitLoss in Sekunden (Richtwerte). */
+const TRACKS = [
+  {name:'Sakhir (Bahrain)', deg:2, overtake:2, pitLoss:21, note:'Abrasiver Asphalt und lange Kurven fordern die Reifen konstant.'},
+  {name:'Jeddah (Saudi-Arabien)', deg:1, overtake:1, pitLoss:19, note:'Extrem schnell und eng an den Mauern – Fehler werden sofort bestraft.'},
+  {name:'Melbourne (Australien)', deg:2, overtake:2, pitLoss:19, note:'Mix aus schnellen und engen Passagen, mittlerer Verschleiß.'},
+  {name:'Suzuka (Japan)', deg:3, overtake:2, pitLoss:20, note:'Die schnelle Esses-Passage erzeugt hohe seitliche Kräfte.'},
+  {name:'Shanghai (China)', deg:2, overtake:2, pitLoss:21, note:'Lange Geraden und ein enger 180°-Knick belasten unterschiedlich.'},
+  {name:'Miami (USA)', deg:2, overtake:2, pitLoss:19, note:'Griffiger Asphalt – der Verschleiß steigt übers Wochenende spürbar.'},
+  {name:'Imola (Italien)', deg:3, overtake:1, pitLoss:23, note:'Eng, bucklig und praktisch ohne echte Überholzonen.'},
+  {name:'Monaco', deg:1, overtake:1, pitLoss:19, note:'Kürzeste Boxengasse im Kalender – aber Überholen ist fast unmöglich.'},
+  {name:'Montreal (Kanada)', deg:2, overtake:3, pitLoss:17, note:'Kurze Boxengasse, lange Geraden – Stopps sind vergleichsweise günstig.'},
+  {name:'Barcelona (Spanien)', deg:3, overtake:2, pitLoss:20, note:'Viele schnelle Kurven mit konstant hoher Querbelastung.'},
+  {name:'Spielberg (Österreich)', deg:2, overtake:3, pitLoss:19, note:'Kurze Runde, kurze Boxengasse, gute Überholchancen.'},
+  {name:'Silverstone (Großbritannien)', deg:3, overtake:3, pitLoss:21, note:'Highspeed-Kurven wie Copse fordern die Reifen extrem.'},
+  {name:'Budapest (Ungarn)', deg:3, overtake:1, pitLoss:21, note:'Kurvenreich, heiß und staubig – Überholen ist Millimeterarbeit.'},
+  {name:'Spa-Francorchamps (Belgien)', deg:2, overtake:3, pitLoss:19, note:'Sehr lange Runde – der Boxenstopp kostet prozentual wenig Zeit.'},
+  {name:'Zandvoort (Niederlande)', deg:3, overtake:1, pitLoss:21, note:'Steilwandkurven und ein enges Layout ohne echte DRS-Zonen.'},
+  {name:'Monza (Italien)', deg:1, overtake:2, pitLoss:23, note:'Kaum Abtrieb nötig, dafür eine lange, langsame Boxengasse.'},
+  {name:'Baku (Aserbaidschan)', deg:1, overtake:2, pitLoss:20, note:'Extrem lange Gerade, aber enge Mauern in der Altstadt.'},
+  {name:'Singapur (Marina Bay)', deg:3, overtake:1, pitLoss:25, note:'Hitze, Bordsteine und die längste Boxengasse der Saison.'},
+  {name:'Austin (USA, COTA)', deg:2, overtake:3, pitLoss:19, note:'Abwechslungsreiches Layout mit fairen Überholmöglichkeiten.'},
+  {name:'Mexiko-Stadt', deg:1, overtake:2, pitLoss:19, note:'Dünne Höhenluft reduziert Abtrieb und Reifenbelastung.'},
+  {name:'São Paulo (Interlagos)', deg:2, overtake:3, pitLoss:18, note:'Kurze, wellige Strecke mit guten Überholzonen.'},
+  {name:'Las Vegas (USA)', deg:1, overtake:2, pitLoss:19, note:'Kalte Nachttemperaturen erschweren das Aufwärmen der Reifen.'},
+  {name:'Lusail (Katar)', deg:3, overtake:1, pitLoss:23, note:'Schnelle Banked Corners zählen zu den härtesten Reifentests im Kalender.'},
+  {name:'Yas Marina (Abu Dhabi)', deg:1, overtake:2, pitLoss:21, note:'Gemischtes Layout, moderater Verschleiß zum Saisonfinale.'},
+];
+
+const trackListEl = document.getElementById('trackList');
+if(trackListEl){
+  TRACKS.forEach(t=>{
+    const opt=document.createElement('option');
+    opt.value=t.name;
+    trackListEl.appendChild(opt);
+  });
+}
+
+let currentWeather='trocken';
+let currentTrack=null;
+
+function findTrack(query){
+  const q=query.trim().toLowerCase();
+  if(!q) return null;
+  return TRACKS.find(t=>t.name.toLowerCase()===q)
+      || TRACKS.find(t=>t.name.toLowerCase().includes(q));
+}
+
+function stintBar(stints){
+  const bars = stints.map(s=>
+    `<div class="stint dark-text" style="--w:${s.w}%;background:${s.color}">${s.label}</div>`
+  ).join('');
+  return `<div class="stint-bar">${bars}</div>`;
+}
+
+function strategyCard(name, when, stints, text, recommended){
+  return `
+    <div class="strategy visible">
+      <div class="strategy-head">
+        <span class="strategy-name">${name}${recommended?'<span class="calc-badge">Empfehlung</span>':''}</span>
+        <span class="strategy-when">${when}</span>
+      </div>
+      ${stintBar(stints)}
+      <p class="compound-desc" style="margin-top:.7rem">${text}</p>
+    </div>`;
+}
+
+function buildStrategies(track, weather){
+  const c = {soft:'var(--soft)', medium:'var(--medium)', hard:'#c9c9c9', inter:'var(--inter)', wet:'var(--wet)'};
+
+  if(weather==='nass'){
+    return [ strategyCard(
+      'Vollnässe-Plan', 'Durchgehend starker Regen',
+      [{label:'Full Wet', w:55, color:c.wet}, {label:'Intermediate', w:45, color:c.inter}],
+      `Start auf Full Wet ist auf ${track.name} Pflicht. Erst wenn die Rundenzeiten sich der Trockenzeit annähern und die Gischt nachlässt, folgt der Wechsel auf Intermediate – der Crossover Point aus Kapitel 6.`,
+      true
+    )];
+  }
+
+  if(weather==='wechselhaft'){
+    const overtakeHint = track.overtake<=1
+      ? `Da Überholen auf ${track.name} kaum möglich ist, lohnt sich ein früher, mutiger Wechsel besonders.`
+      : `Da Überholen auf ${track.name} gut funktioniert, kann man einen falschen Reifenwechsel notfalls wieder aufholen.`;
+    return [
+      strategyCard(
+        'Abwartender Plan', 'Schauer möglich, Strecke wechselnd nass',
+        [{label:'Intermediate', w:45, color:c.inter}, {label:'Medium', w:55, color:c.medium}],
+        `Start auf Intermediate, Wechsel auf Medium sobald die Strecke laut Regenradar (Kapitel 6) abtrocknet. ${overtakeHint}`,
+        true
+      ),
+      strategyCard(
+        'Undercut-Wette', 'Für mutige Strategen',
+        [{label:'Medium', w:30, color:c.medium}, {label:'Intermediate', w:30, color:c.inter}, {label:'Hard', w:40, color:c.hard}],
+        `Früher als die Konkurrenz auf den jeweils passenden Reifen wechseln, um mit freier Bahn Zeit gutzumachen – riskant, wenn die Vorhersage nicht stimmt.`,
+        false
+      )
+    ];
+  }
+
+  // trocken
+  const twoStopFavored = track.deg>=2 && track.overtake>=2 && track.pitLoss<=21;
+  const oneStop = strategyCard(
+    'Einstopp-Strategie', `Medium → Hard`,
+    [{label:'Medium', w:48, color:c.medium}, {label:'Hard', w:52, color:c.hard}],
+    `Pit-Loss auf ${track.name} liegt bei rund ${track.pitLoss}s. ${track.overtake<=1 ? 'Überholen ist hier so schwer, dass jeder zusätzliche Stopp brandgefährlich ist.' : 'Weniger Stopps sparen Zeit in der Box, kosten aber Tempo gegen Rennende.'}`,
+    !twoStopFavored
+  );
+  const twoStop = strategyCard(
+    'Zweistopp-Strategie', `Soft → Medium → Medium`,
+    [{label:'S', w:22, color:c.soft}, {label:'Medium', w:39, color:c.medium}, {label:'Medium', w:39, color:c.medium}],
+    `Der Reifenverschleiß auf ${track.name} ist ${track.deg>=3?'hoch':'spürbar'} und Überholen ${track.overtake>=2?'funktioniert gut':'ist möglich'} – ein zweiter Stopp bringt konstant frischeren Grip, ohne im Verkehr steckenzubleiben.`,
+    twoStopFavored
+  );
+  return [oneStop, twoStop];
+}
+
+function renderCalc(){
+  const out = document.getElementById('calcOutput');
+  if(!out) return;
+  if(!currentTrack){
+    out.innerHTML = '<p class="calc-placeholder">Wähle oben eine Strecke aus der Liste – die passenden Strategien erscheinen sofort.</p>';
+    return;
+  }
+  const info = `<div class="calc-track-info"><b>${currentTrack.name}</b> · ${currentTrack.note} Pit-Loss ca. <b>${currentTrack.pitLoss}s</b>.</div>`;
+  const cards = buildStrategies(currentTrack, currentWeather).join('');
+  out.innerHTML = info + cards;
+}
+
+const trackInputEl = document.getElementById('trackInput');
+if(trackInputEl){
+  trackInputEl.addEventListener('input', ()=>{
+    const match = findTrack(trackInputEl.value);
+    currentTrack = match || null;
+    renderCalc();
+  });
+}
+
+document.querySelectorAll('.w-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.w-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentWeather = btn.dataset.w;
+    renderCalc();
+  });
 });
 </script>
 </body>
