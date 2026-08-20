@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>Musikwünsche — Set-Planung</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="../icons/favicon.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{color-scheme:light dark;--bg:#FBF7FF;--bg-card:#fff;--text:#1B1526;--text-muted:#7A7288;--accent:#E01E7A;--accent-2:#7C3AED;--accent-light:#FBE3F0;--accent-dark:#B8135F;--border:#EBE2F4;--red:#E2405A;--shadow:0 2px 20px rgba(90,30,100,.08);--font-display:'Cormorant Garamond',Georgia,serif;--font-body:'Outfit',system-ui,sans-serif;--radius:16px}
+body.dark{color-scheme:dark;--bg:#100B1E;--bg-card:#1B1530;--text:#F3EEFF;--text-muted:#9A90B5;--accent:#FF4FA0;--accent-2:#9D7BFF;--accent-light:rgba(255,79,160,.14);--accent-dark:#FF7FBA;--border:#2E2650;--shadow:0 2px 20px rgba(0,0,0,.4)}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;line-height:1.6}
+.wrap{max-width:760px;margin:0 auto;padding:2.4rem 1.3rem 4rem}
+h1{font-family:var(--font-display);font-size:2rem;font-weight:600;margin-bottom:.3rem}
+.sub{color:var(--text-muted);font-size:.88rem;margin-bottom:1.6rem}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow);margin-bottom:1.2rem}
+input[type=password],input[type=text]{width:100%;padding:.7rem .9rem;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font:inherit;font-size:.95rem}
+button{font:inherit;cursor:pointer}
+.btn{padding:.7rem 1.1rem;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:600;font-size:.9rem}
+.btn-ghost{padding:.5rem .8rem;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text-muted);font-size:.82rem}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.row{display:flex;gap:.7rem;align-items:center}
+.row>*{flex:1}
+table{width:100%;border-collapse:collapse;font-size:.88rem}
+th,td{text-align:left;padding:.55rem .5rem;border-bottom:1px solid var(--border)}
+th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)}
+tr.hidden-row{opacity:.4}
+.votes{font-weight:700;color:var(--accent-dark)}
+.actions{white-space:nowrap}
+.actions button{margin-right:.3rem}
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.6rem}
+#loginCard{max-width:380px;margin:4rem auto}
+.hidden{display:none}
+.empty{color:var(--text-muted);font-size:.88rem;padding:1rem 0;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div id="loginCard" class="card">
+    <h1 style="font-size:1.4rem">🔒 Set-Planung</h1>
+    <p class="sub">Admin-Passwort eingeben, um alle Wünsche zu sehen.</p>
+    <div class="row" style="margin-bottom:.8rem">
+      <input type="password" id="pwInput" placeholder="Passwort" autocomplete="off">
+    </div>
+    <button class="btn" onclick="login()" style="width:100%">Anmelden</button>
+    <div class="sub" id="loginMsg" style="margin-top:.6rem;color:var(--red)"></div>
+  </div>
+
+  <div id="appView" class="hidden">
+    <h1>🎧 Set-Planung</h1>
+    <p class="sub">Alle Wünsche, sortiert nach Stimmen. Ausblenden = fliegt aus der öffentlichen Liste & aus dem Playlist-Export.</p>
+
+    <div class="top-bar">
+      <span class="sub" id="statLine" style="margin:0"></span>
+      <div>
+        <button class="btn-ghost" onclick="loadAll()">↻ Aktualisieren</button>
+        <button class="btn-ghost" onclick="copyExport()">📋 Liste kopieren</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <table>
+        <thead><tr><th>Titel</th><th>Interpret</th><th>Stimmen</th><th>Aktion</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="4" class="empty">Lädt …</td></tr></tbody>
+      </table>
+    </div>
+
+    <p class="sub">Tipp: Liste kopieren und mir (Claude) schicken mit „erstell die Playlist daraus“ — ich lege sie dann per Spotify-Verbindung direkt in deinem Account an.</p>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://pujtwdutqtcrnlidbfgx.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1anR3ZHV0cXRjcm5saWRiZmd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NTE4OTUsImV4cCI6MjA5ODMyNzg5NX0.dQix5c07xcBDIsDJvtRhV37W3tdEV01aMMALRgq2P6s";
+let currentPassword = null;
+let currentRows = [];
+
+async function sb(path, opts){
+  const res = await fetch(SUPABASE_URL + path, Object.assign({
+    headers: Object.assign({
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json'
+    }, (opts&&opts.headers)||{})
+  }, opts));
+  const data = await res.json().catch(()=>null);
+  if(!res.ok){
+    const msg = (data && (data.message||data.hint||data.error)) || res.statusText;
+    throw new Error(msg);
+  }
+  return data;
+}
+
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+async function login(){
+  const pw = document.getElementById('pwInput').value;
+  const msgEl = document.getElementById('loginMsg');
+  msgEl.textContent = '';
+  try{
+    const rows = await sb('/rest/v1/rpc/admin_list_requests', { method: 'POST', body: JSON.stringify({ p_password: pw }) });
+    currentPassword = pw;
+    sessionStorage.setItem('mw_admin_pw', pw);
+    document.getElementById('loginCard').classList.add('hidden');
+    document.getElementById('appView').classList.remove('hidden');
+    renderRows(rows);
+  }catch(e){
+    msgEl.textContent = 'Falsches Passwort.';
+  }
+}
+
+async function loadAll(){
+  if(!currentPassword) return;
+  try{
+    const rows = await sb('/rest/v1/rpc/admin_list_requests', { method: 'POST', body: JSON.stringify({ p_password: currentPassword }) });
+    renderRows(rows);
+  }catch(e){
+    document.getElementById('rows').innerHTML = '<tr><td colspan="4" class="empty">Fehler beim Laden.</td></tr>';
+  }
+}
+
+function renderRows(rows){
+  currentRows = rows;
+  const tbody = document.getElementById('rows');
+  document.getElementById('statLine').textContent = rows.length + ' Wünsche gesamt · ' + rows.filter(r=>!r.hidden).length + ' sichtbar';
+  if(!rows.length){ tbody.innerHTML = '<tr><td colspan="4" class="empty">Noch keine Wünsche.</td></tr>'; return; }
+  tbody.innerHTML = rows.map(r =>
+    '<tr class="'+(r.hidden?'hidden-row':'')+'">'
+    + '<td>'+escapeHtml(r.title)+'</td>'
+    + '<td>'+escapeHtml(r.artist)+'</td>'
+    + '<td class="votes">'+r.votes+'</td>'
+    + '<td class="actions"><button class="btn-ghost" onclick="toggleHidden(\''+r.id+'\', '+(!r.hidden)+')">'+(r.hidden?'Einblenden':'Ausblenden')+'</button></td>'
+    + '</tr>'
+  ).join('');
+}
+
+async function toggleHidden(id, hide){
+  try{
+    await sb('/rest/v1/rpc/admin_set_hidden', { method: 'POST', body: JSON.stringify({ p_password: currentPassword, p_request_id: id, p_hidden: hide }) });
+    loadAll();
+  }catch(e){ alert('Konnte nicht geändert werden.'); }
+}
+
+function copyExport(){
+  const visible = currentRows.filter(r=>!r.hidden).sort((a,b)=>b.votes-a.votes);
+  const text = visible.map(r => (r.votes+'x  '+r.title+' — '+r.artist)).join('\n');
+  navigator.clipboard.writeText(text).then(()=>{
+    alert('Liste kopiert (' + visible.length + ' Songs).');
+  }).catch(()=>{
+    prompt('Manuell kopieren:', text);
+  });
+}
+
+(function tryAutoLogin(){
+  const saved = sessionStorage.getItem('mw_admin_pw');
+  if(saved){
+    document.getElementById('pwInput').value = saved;
+    login();
+  }
+})();
+</script>
+</body>
+</html>

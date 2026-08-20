@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<title>Musikwünsche</title>
+<meta name="theme-color" content="#0F0B1F">
+<meta name="description" content="Sag uns, welche Songs auf keinen Fall fehlen dürfen — anonym, in 30 Sekunden.">
+<link rel="icon" href="../icons/favicon.png" type="image/png">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{color-scheme:light dark;--bg:#FBF7FF;--bg-card:#fff;--text:#1B1526;--text-muted:#7A7288;--accent:#E01E7A;--accent-2:#7C3AED;--accent-light:#FBE3F0;--accent-dark:#B8135F;--border:#EBE2F4;--green:#2FAE6B;--red:#E2405A;--nav-bg:rgba(251,247,255,.9);--shadow:0 2px 20px rgba(90,30,100,.08);--shadow-h:0 10px 40px rgba(90,30,100,.16);--font-display:'Cormorant Garamond',Georgia,serif;--font-body:'Outfit',system-ui,sans-serif;--radius:16px}
+body.dark{color-scheme:dark;--bg:#100B1E;--bg-card:#1B1530;--text:#F3EEFF;--text-muted:#9A90B5;--accent:#FF4FA0;--accent-2:#9D7BFF;--accent-light:rgba(255,79,160,.14);--accent-dark:#FF7FBA;--border:#2E2650;--shadow:0 2px 20px rgba(0,0,0,.4);--shadow-h:0 10px 40px rgba(0,0,0,.55)}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);line-height:1.6;min-height:100vh;transition:background-color .3s,color .3s}
+a{color:inherit}
+.wrap{max-width:640px;margin:0 auto;padding:0 1.3rem}
+nav{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.3rem;background:var(--nav-bg);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.nav-title{font-family:var(--font-display);font-size:1.1rem;font-weight:600}
+.nav-title span{background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.nav-theme-btn{font-size:1rem;background:none;border:1px solid var(--border);border-radius:8px;padding:.35rem .6rem;cursor:pointer;color:var(--text-muted)}
+.nav-theme-btn:hover{border-color:var(--accent);color:var(--accent)}
+header.hero{text-align:center;padding:3rem 1.3rem 2rem}
+.hero-eyebrow{font-size:.72rem;font-weight:700;letter-spacing:.2em;text-transform:uppercase;color:var(--accent);margin-bottom:.7rem}
+.hero-title{font-family:var(--font-display);font-size:clamp(2rem,7vw,2.9rem);font-weight:600;line-height:1.1}
+.hero-title em{font-style:italic;background:linear-gradient(90deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero-sub{color:var(--text-muted);margin-top:.8rem;font-size:.95rem}
+main{padding-bottom:4rem}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow);margin-bottom:1.4rem}
+.field{position:relative;margin-bottom:.9rem}
+.field label{display:block;font-size:.72rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;color:var(--text-muted);margin-bottom:.4rem}
+.field input{width:100%;padding:.75rem .9rem;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font:inherit;font-size:.95rem}
+.field input:focus{outline:none;border-color:var(--accent)}
+.suggest{position:absolute;left:0;right:0;top:100%;margin-top:.3rem;background:var(--bg-card);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow-h);z-index:50;max-height:260px;overflow-y:auto;display:none}
+.suggest.open{display:block}
+.suggest-item{padding:.65rem .9rem;font-size:.88rem;cursor:pointer;border-bottom:1px solid var(--border)}
+.suggest-item:last-child{border-bottom:none}
+.suggest-item:hover,.suggest-item.active{background:var(--accent-light)}
+.suggest-item b{font-weight:600}
+.suggest-item small{display:block;color:var(--text-muted);font-size:.76rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;width:100%;padding:.85rem 1rem;border-radius:12px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font:inherit;font-weight:600;font-size:.95rem;cursor:pointer;transition:transform .15s,opacity .2s}
+.btn:hover{transform:translateY(-1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.hint{font-size:.78rem;color:var(--text-muted);margin-top:.7rem;text-align:center}
+.msg{font-size:.85rem;border-radius:10px;padding:.7rem .9rem;margin-top:.8rem;display:none}
+.msg.ok{display:block;background:var(--accent-light);color:var(--accent-dark)}
+.msg.err{display:block;background:rgba(226,64,90,.12);color:var(--red)}
+.list-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.9rem}
+.list-head h2{font-family:var(--font-display);font-size:1.3rem;font-weight:600}
+.list-head small{color:var(--text-muted);font-size:.78rem}
+.req{display:flex;align-items:center;gap:.8rem;padding:.7rem 0;border-bottom:1px solid var(--border)}
+.req:last-child{border-bottom:none}
+.req-info b{display:block;font-size:.92rem}
+.req-info span{color:var(--text-muted);font-size:.8rem}
+.vote-btn{margin-left:auto;flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:.15rem;background:var(--accent-light);border:1.5px solid transparent;border-radius:10px;padding:.4rem .7rem;cursor:pointer;color:var(--accent-dark);font:inherit;font-weight:700;font-size:.85rem;min-width:52px}
+.vote-btn:hover{border-color:var(--accent)}
+.vote-btn.voted{background:transparent;border-color:var(--border);color:var(--text-muted);cursor:default}
+.vote-btn small{font-size:.6rem;font-weight:600;letter-spacing:.03em;text-transform:uppercase}
+.empty{color:var(--text-muted);font-size:.88rem;text-align:center;padding:1rem 0}
+footer{text-align:center;color:var(--text-muted);font-size:.76rem;padding:1rem 1.3rem 3rem}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-title">🎤 <span>Musikwünsche</span></span>
+  <button class="nav-theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Hell/Dunkel umschalten">🌙</button>
+</nav>
+
+<header class="hero">
+  <div class="hero-eyebrow">Aula-Abend · Vorab-Wünsche</div>
+  <h1 class="hero-title">Welcher Song <em>muss</em> laufen?</h1>
+  <p class="hero-sub">Trag bis zu 3 Songs ein, die du dir wünschst. Komplett anonym — wir bauen daraus vorab das Set.</p>
+</header>
+
+<main class="wrap">
+
+  <div class="card">
+    <div class="field">
+      <label for="titleInput">Titel</label>
+      <input id="titleInput" type="text" autocomplete="off" placeholder="z. B. Blinding Lights">
+      <div class="suggest" id="titleSuggest"></div>
+    </div>
+    <div class="field">
+      <label for="artistInput">Interpret</label>
+      <input id="artistInput" type="text" autocomplete="off" placeholder="z. B. The Weeknd">
+      <div class="suggest" id="artistSuggest"></div>
+    </div>
+    <button class="btn" id="submitBtn" onclick="submitWish()">Wunsch hinzufügen 🎶</button>
+    <div class="msg" id="formMsg"></div>
+    <div class="hint" id="countHint"></div>
+  </div>
+
+  <div class="card">
+    <div class="list-head">
+      <h2>Schon gewünscht</h2>
+      <small id="listCount"></small>
+    </div>
+    <div id="reqList"><div class="empty">Lädt …</div></div>
+  </div>
+
+</main>
+
+<footer>Anonym · kein Login · Daten werden nur für die Set-Planung genutzt.</footer>
+
+<script>
+const SUPABASE_URL = "https://pujtwdutqtcrnlidbfgx.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1anR3ZHV0cXRjcm5saWRiZmd4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI3NTE4OTUsImV4cCI6MjA5ODMyNzg5NX0.dQix5c07xcBDIsDJvtRhV37W3tdEV01aMMALRgq2P6s";
+const MAX_WISHES = 3;
+
+function toggleTheme(){
+  document.body.classList.toggle('dark');
+  const isDark=document.body.classList.contains('dark');
+  document.getElementById('themeBtn').textContent=isDark?'☀️':'🌙';
+  localStorage.setItem('mw_theme',isDark?'dark':'light');
+}
+(function initTheme(){
+  const saved=localStorage.getItem('mw_theme');
+  const wantDark=saved?saved==='dark':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if(wantDark){
+    document.body.classList.add('dark');
+    window.addEventListener('DOMContentLoaded',()=>{document.getElementById('themeBtn').textContent='☀️';});
+  }
+})();
+
+function getDeviceToken(){
+  let t = localStorage.getItem('mw_device');
+  if(!t){
+    t = (crypto.randomUUID ? crypto.randomUUID() : (Date.now()+'-'+Math.random().toString(36).slice(2)));
+    localStorage.setItem('mw_device', t);
+  }
+  return t;
+}
+function getLocalCount(){ return parseInt(localStorage.getItem('mw_count')||'0',10); }
+function bumpLocalCount(){ localStorage.setItem('mw_count', String(getLocalCount()+1)); updateCountHint(); }
+function getVoted(){ try{ return JSON.parse(localStorage.getItem('mw_voted')||'[]'); }catch(e){ return []; } }
+function markVoted(id){ const v=getVoted(); if(!v.includes(id)){ v.push(id); localStorage.setItem('mw_voted', JSON.stringify(v)); } }
+
+function updateCountHint(){
+  const left = Math.max(0, MAX_WISHES - getLocalCount());
+  const hint = document.getElementById('countHint');
+  const btn = document.getElementById('submitBtn');
+  if(left <= 0){
+    hint.textContent = 'Danke! Du hast schon ' + MAX_WISHES + ' Wünsche abgegeben.';
+    btn.disabled = true;
+  } else {
+    hint.textContent = 'Noch ' + left + ' von ' + MAX_WISHES + ' Wünschen übrig.';
+    btn.disabled = false;
+  }
+}
+
+async function sb(path, opts){
+  const res = await fetch(SUPABASE_URL + path, Object.assign({
+    headers: Object.assign({
+      'apikey': SUPABASE_ANON_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+      'Content-Type': 'application/json'
+    }, (opts&&opts.headers)||{})
+  }, opts));
+  const data = await res.json().catch(()=>null);
+  if(!res.ok){
+    const msg = (data && (data.message||data.hint||data.error)) || res.statusText;
+    throw new Error(msg);
+  }
+  return data;
+}
+
+let mbAbort = null;
+async function searchMusicBrainz(term){
+  if(mbAbort) mbAbort.abort();
+  mbAbort = new AbortController();
+  const url = 'https://musicbrainz.org/ws/2/recording/?query=' + encodeURIComponent(term) + '&fmt=json&limit=8';
+  const res = await fetch(url, { signal: mbAbort.signal });
+  if(!res.ok) throw new Error('musicbrainz error');
+  const data = await res.json();
+  return (data.recordings||[]).map(r => ({
+    title: r.title,
+    artist: (r['artist-credit'] && r['artist-credit'][0] && r['artist-credit'][0].name) || '',
+    mbid: r.id
+  })).filter(r => r.artist);
+}
+
+function debounce(fn, ms){
+  let t;
+  return (...args) => { clearTimeout(t); t = setTimeout(()=>fn(...args), ms); };
+}
+
+function wireAutocomplete(inputEl, suggestEl){
+  const run = debounce(async () => {
+    const term = inputEl.value.trim();
+    if(term.length < 2){ suggestEl.classList.remove('open'); suggestEl.innerHTML=''; return; }
+    try{
+      const results = await searchMusicBrainz(term);
+      if(!results.length){ suggestEl.classList.remove('open'); suggestEl.innerHTML=''; return; }
+      suggestEl.innerHTML = results.map((r,i) =>
+        '<div class="suggest-item" data-i="'+i+'"><b>'+escapeHtml(r.title)+'</b><small>'+escapeHtml(r.artist)+'</small></div>'
+      ).join('');
+      suggestEl.classList.add('open');
+      Array.from(suggestEl.children).forEach((el,i) => {
+        el.addEventListener('click', () => {
+          document.getElementById('titleInput').value = results[i].title;
+          document.getElementById('artistInput').value = results[i].artist;
+          document.getElementById('titleInput').dataset.mbid = results[i].mbid;
+          suggestEl.classList.remove('open');
+        });
+      });
+    }catch(e){ /* MusicBrainz nicht erreichbar - stiller Fallback auf manuelle Eingabe */ }
+  }, 450);
+  inputEl.addEventListener('input', () => { delete document.getElementById('titleInput').dataset.mbid; run(); });
+  inputEl.addEventListener('blur', () => setTimeout(()=>suggestEl.classList.remove('open'), 150));
+}
+
+function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+async function submitWish(){
+  const titleEl = document.getElementById('titleInput');
+  const artistEl = document.getElementById('artistInput');
+  const msgEl = document.getElementById('formMsg');
+  const title = titleEl.value.trim();
+  const artist = artistEl.value.trim();
+  msgEl.className = 'msg';
+  if(!title || !artist){
+    msgEl.textContent = 'Bitte Titel und Interpret ausfüllen.';
+    msgEl.className = 'msg err';
+    return;
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  try{
+    await sb('/rest/v1/rpc/submit_song', {
+      method: 'POST',
+      body: JSON.stringify({
+        p_artist: artist,
+        p_title: title,
+        p_mbid: titleEl.dataset.mbid || null,
+        p_device_token: getDeviceToken()
+      })
+    });
+    bumpLocalCount();
+    titleEl.value=''; artistEl.value=''; delete titleEl.dataset.mbid;
+    msgEl.textContent = 'Danke, dein Wunsch ist gespeichert! 🎉';
+    msgEl.className = 'msg ok';
+    loadList();
+  }catch(e){
+    if(String(e.message).includes('limit_reached')){
+      localStorage.setItem('mw_count', String(MAX_WISHES));
+      msgEl.textContent = 'Du hast schon ' + MAX_WISHES + ' Wünsche abgegeben — danke!';
+    } else {
+      msgEl.textContent = 'Konnte nicht gespeichert werden. Nochmal versuchen?';
+    }
+    msgEl.className = 'msg err';
+  }
+  updateCountHint();
+}
+
+async function upvote(id, btnEl){
+  if(getVoted().includes(id)) return;
+  try{
+    await sb('/rest/v1/rpc/upvote_song', {
+      method: 'POST',
+      body: JSON.stringify({ p_request_id: id, p_device_token: getDeviceToken() })
+    });
+  }catch(e){ /* evtl. schon gevotet - trotzdem lokal markieren */ }
+  markVoted(id);
+  loadList();
+}
+
+async function loadList(){
+  const listEl = document.getElementById('reqList');
+  const countEl = document.getElementById('listCount');
+  try{
+    const rows = await sb('/rest/v1/song_requests_public?select=*&order=votes.desc,created_at.asc', { method: 'GET' });
+    countEl.textContent = rows.length + (rows.length===1 ? ' Wunsch' : ' Wünsche');
+    if(!rows.length){ listEl.innerHTML = '<div class="empty">Noch keine Wünsche — sei der/die Erste!</div>'; return; }
+    const voted = getVoted();
+    listEl.innerHTML = rows.map(r => {
+      const isVoted = voted.includes(r.id);
+      return '<div class="req"><div class="req-info"><b>'+escapeHtml(r.title)+'</b><span>'+escapeHtml(r.artist)+'</span></div>'
+        + '<button class="vote-btn'+(isVoted?' voted':'')+'" onclick="upvote(\''+r.id+'\', this)">'
+        + (r.votes) + '<small>'+(isVoted?'dabei':'+1')+'</small></button></div>';
+    }).join('');
+  }catch(e){
+    listEl.innerHTML = '<div class="empty">Liste konnte nicht geladen werden.</div>';
+  }
+}
+
+wireAutocomplete(document.getElementById('titleInput'), document.getElementById('titleSuggest'));
+wireAutocomplete(document.getElementById('artistInput'), document.getElementById('artistSuggest'));
+updateCountHint();
+loadList();
+</script>
+</body>
+</html>
