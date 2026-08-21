@@ -7,34 +7,58 @@
 <title>Musikwünsche — Set-Planung</title>
 <meta name="robots" content="noindex">
 <link rel="icon" href="../icons/favicon.png" type="image/png">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-:root{color-scheme:light dark;--bg:#FBF7FF;--bg-card:#fff;--text:#1B1526;--text-muted:#7A7288;--accent:#E01E7A;--accent-2:#7C3AED;--accent-light:#FBE3F0;--accent-dark:#B8135F;--border:#EBE2F4;--red:#E2405A;--shadow:0 2px 20px rgba(90,30,100,.08);--font-display:'Cormorant Garamond',Georgia,serif;--font-body:'Outfit',system-ui,sans-serif;--radius:16px}
-body.dark{color-scheme:dark;--bg:#100B1E;--bg-card:#1B1530;--text:#F3EEFF;--text-muted:#9A90B5;--accent:#FF4FA0;--accent-2:#9D7BFF;--accent-light:rgba(255,79,160,.14);--accent-dark:#FF7FBA;--border:#2E2650;--shadow:0 2px 20px rgba(0,0,0,.4)}
-body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;line-height:1.6}
-.wrap{max-width:760px;margin:0 auto;padding:2.4rem 1.3rem 4rem}
-h1{font-family:var(--font-display);font-size:2rem;font-weight:600;margin-bottom:.3rem}
-.sub{color:var(--text-muted);font-size:.88rem;margin-bottom:1.6rem}
-.card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:1.4rem;box-shadow:var(--shadow);margin-bottom:1.2rem}
-input[type=password],input[type=text]{width:100%;padding:.7rem .9rem;border-radius:10px;border:1.5px solid var(--border);background:var(--bg);color:var(--text);font:inherit;font-size:.95rem}
-button{font:inherit;cursor:pointer}
-.btn{padding:.7rem 1.1rem;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:600;font-size:.9rem}
-.btn-ghost{padding:.5rem .8rem;border-radius:8px;border:1px solid var(--border);background:none;color:var(--text-muted);font-size:.82rem}
+:root{color-scheme:light dark;
+  --bg:#FBF8F4;--surface:#FFFFFF;--surface-2:#F3EDE3;
+  --ink:#221C2E;--ink-muted:#6B6478;--ink-faint:#A79FB0;--line:#E9E1D6;
+  --accent:#FF7A3D;--accent-2:#FFC145;--accent-ink:#221200;--red:#E2405A;
+  --gold:#C9891B;--silver:#8A8194;--bronze:#B06A34;
+  --shadow:0 2px 16px rgba(40,20,10,.06);
+}
+body.dark{color-scheme:dark;
+  --bg:#131019;--surface:#1D1926;--surface-2:#262032;
+  --ink:#F5EFE4;--ink-muted:#A79CB4;--ink-faint:#6E6480;--line:rgba(245,239,228,.12);
+  --accent:#FF8A3D;--accent-2:#FFD166;--accent-ink:#1A1220;
+  --gold:#FFD166;--silver:#C9C2D6;--bronze:#E0A05E;
+  --shadow:0 2px 16px rgba(0,0,0,.35);
+}
+body{background:var(--bg);color:var(--ink);font-family:'Work Sans',system-ui,sans-serif;min-height:100vh;line-height:1.55;transition:background-color .4s,color .4s}
+.display{font-family:'Bebas Neue',system-ui,sans-serif;letter-spacing:.01em}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
+button{font:inherit;cursor:pointer;color:inherit}
+.wrap{max-width:760px;margin:0 auto;padding:2.6rem 1.3rem 4rem}
+h1{font-size:2.1rem;margin-bottom:.2rem}
+.sub{color:var(--ink-muted);font-size:.86rem;margin-bottom:1.6rem}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:1.4rem;box-shadow:var(--shadow);margin-bottom:1.2rem}
+input[type=password]{width:100%;padding:.75rem .9rem;border-radius:10px;border:1px solid var(--line);background:var(--surface-2);color:var(--ink);font:inherit;font-size:.95rem}
+input[type=password]:focus{outline:none;border-color:var(--accent)}
+.btn{padding:.75rem 1.1rem;border-radius:10px;border:none;background:linear-gradient(100deg,var(--accent),var(--accent-2));color:var(--accent-ink);font-weight:700;font-size:.92rem;transition:transform .25s cubic-bezier(.34,1.56,.64,1)}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:scale(.97)}
+.btn-ghost{padding:.5rem .85rem;border-radius:99px;border:1px solid var(--line);background:none;color:var(--ink-muted);font-size:.8rem;transition:border-color .2s,color .2s}
 .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
-.row{display:flex;gap:.7rem;align-items:center}
-.row>*{flex:1}
-table{width:100%;border-collapse:collapse;font-size:.88rem}
-th,td{text-align:left;padding:.55rem .5rem;border-bottom:1px solid var(--border)}
-th{font-size:.7rem;text-transform:uppercase;letter-spacing:.05em;color:var(--text-muted)}
-tr.hidden-row{opacity:.4}
-.votes{font-weight:700;color:var(--accent-dark)}
-.actions{white-space:nowrap}
-.actions button{margin-right:.3rem}
 .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.6rem}
 #loginCard{max-width:380px;margin:4rem auto}
 .hidden{display:none}
-.empty{color:var(--text-muted);font-size:.88rem;padding:1rem 0;text-align:center}
+.empty{color:var(--ink-muted);font-size:.88rem;padding:1rem 0;text-align:center}
+
+.row-list{display:flex;flex-direction:column;gap:.55rem}
+.row-item{position:relative;display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:.9rem;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:.75rem .95rem;overflow:hidden;transition:opacity .3s}
+.row-item.is-hidden{opacity:.42}
+.row-item .bar{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 14%, transparent), transparent);z-index:0}
+.row-item>*{position:relative;z-index:1}
+.rank{font-size:1.7rem;line-height:1;color:var(--ink-faint);min-width:1.6ch;text-align:center}
+.rank.gold{color:var(--gold)}
+.rank.silver{color:var(--silver)}
+.rank.bronze{color:var(--bronze)}
+.r-info{min-width:0}
+.r-info b{display:block;font-size:.95rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.r-info span{display:block;color:var(--ink-muted);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.votes{font-weight:700;font-size:.98rem}
 </style>
 </head>
 <body>
@@ -42,9 +66,9 @@ tr.hidden-row{opacity:.4}
 <div class="wrap">
 
   <div id="loginCard" class="card">
-    <h1 style="font-size:1.4rem">🔒 Set-Planung</h1>
+    <h1 class="display" style="font-size:1.7rem">🔒 Set-Planung</h1>
     <p class="sub">Admin-Passwort eingeben, um alle Wünsche zu sehen.</p>
-    <div class="row" style="margin-bottom:.8rem">
+    <div style="margin-bottom:.8rem">
       <input type="password" id="pwInput" placeholder="Passwort" autocomplete="off">
     </div>
     <button class="btn" onclick="login()" style="width:100%">Anmelden</button>
@@ -52,25 +76,20 @@ tr.hidden-row{opacity:.4}
   </div>
 
   <div id="appView" class="hidden">
-    <h1>🎧 Set-Planung</h1>
+    <h1 class="display">🎧 Set-Planung</h1>
     <p class="sub">Alle Wünsche, sortiert nach Stimmen. Ausblenden = fliegt aus der öffentlichen Liste & aus dem Playlist-Export.</p>
 
     <div class="top-bar">
       <span class="sub" id="statLine" style="margin:0"></span>
-      <div>
+      <div style="display:flex;gap:.5rem">
         <button class="btn-ghost" onclick="loadAll()">↻ Aktualisieren</button>
         <button class="btn-ghost" onclick="copyExport()">📋 Liste kopieren</button>
       </div>
     </div>
 
-    <div class="card">
-      <table>
-        <thead><tr><th>Titel</th><th>Interpret</th><th>Stimmen</th><th>Aktion</th></tr></thead>
-        <tbody id="rows"><tr><td colspan="4" class="empty">Lädt …</td></tr></tbody>
-      </table>
-    </div>
+    <div class="row-list" id="rows"><div class="empty">Lädt …</div></div>
 
-    <p class="sub">Tipp: Liste kopieren und mir (Claude) schicken mit „erstell die Playlist daraus“ — ich lege sie dann per Spotify-Verbindung direkt in deinem Account an.</p>
+    <p class="sub" style="margin-top:1.4rem">Tipp: Liste kopieren und mir (Claude) schicken mit „erstell die Playlist daraus" — ich lege sie dann per Spotify-Verbindung direkt in deinem Account an.</p>
   </div>
 
 </div>
@@ -80,6 +99,12 @@ const SUPABASE_URL = "https://nacxltgqyijpdezlgwxw.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hY3hsdGdxeWlqcGRlemxnd3h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyNDUyNTQsImV4cCI6MjEwMjgyMTI1NH0.-9bN-QKaBgE2pRbqngDflCD6P9k37DW_ZO4_wqYWl9s";
 let currentPassword = null;
 let currentRows = [];
+const rankClass = ['gold','silver','bronze'];
+
+(function initTheme(){
+  const wantDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  if(wantDark) document.body.classList.add('dark');
+})();
 
 async function sb(path, opts){
   const res = await fetch(SUPABASE_URL + path, Object.assign({
@@ -121,23 +146,26 @@ async function loadAll(){
     const rows = await sb('/rest/v1/rpc/admin_list_requests', { method: 'POST', body: JSON.stringify({ p_password: currentPassword }) });
     renderRows(rows);
   }catch(e){
-    document.getElementById('rows').innerHTML = '<tr><td colspan="4" class="empty">Fehler beim Laden.</td></tr>';
+    document.getElementById('rows').innerHTML = '<div class="empty">Fehler beim Laden.</div>';
   }
 }
 
 function renderRows(rows){
   currentRows = rows;
-  const tbody = document.getElementById('rows');
+  const list = document.getElementById('rows');
   document.getElementById('statLine').textContent = rows.length + ' Wünsche gesamt · ' + rows.filter(r=>!r.hidden).length + ' sichtbar';
-  if(!rows.length){ tbody.innerHTML = '<tr><td colspan="4" class="empty">Noch keine Wünsche.</td></tr>'; return; }
-  tbody.innerHTML = rows.map(r =>
-    '<tr class="'+(r.hidden?'hidden-row':'')+'">'
-    + '<td>'+escapeHtml(r.title)+'</td>'
-    + '<td>'+escapeHtml(r.artist)+'</td>'
-    + '<td class="votes">'+r.votes+'</td>'
-    + '<td class="actions"><button class="btn-ghost" onclick="toggleHidden(\''+r.id+'\', '+(!r.hidden)+')">'+(r.hidden?'Einblenden':'Ausblenden')+'</button></td>'
-    + '</tr>'
-  ).join('');
+  if(!rows.length){ list.innerHTML = '<div class="empty">Noch keine Wünsche.</div>'; return; }
+  const max = Math.max.apply(null, rows.map(r=>r.votes)) || 1;
+  list.innerHTML = rows.map((r, idx) => {
+    const rc = (!r.hidden && rankClass[idx]) ? ' ' + rankClass[idx] : '';
+    return '<div class="row-item'+(r.hidden?' is-hidden':'')+'">'
+      + '<div class="bar" style="width:'+(r.votes/max*100)+'%"></div>'
+      + '<div class="rank display'+rc+'">'+(idx+1)+'</div>'
+      + '<div class="r-info"><b>'+escapeHtml(r.title)+'</b><span>'+escapeHtml(r.artist)+'</span></div>'
+      + '<div class="votes mono">'+r.votes+'</div>'
+      + '<button class="btn-ghost" onclick="toggleHidden(\''+r.id+'\', '+(!r.hidden)+')">'+(r.hidden?'Einblenden':'Ausblenden')+'</button>'
+      + '</div>';
+  }).join('');
 }
 
 async function toggleHidden(id, hide){
