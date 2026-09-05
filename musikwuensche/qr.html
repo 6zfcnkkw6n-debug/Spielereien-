@@ -4,54 +4,54 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="dark">
-<title>Musikwünsche — Poster</title>
+<title>Weihnachtsfest 17.12. — Poster</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#131019;--surface:#1D1926;--ink:#F5EFE4;--ink-muted:#A79CB4;--line:rgba(245,239,228,.14);
-  --accent:#FF8A3D;--accent-2:#FFD166;--accent-ink:#1A1220;
+  --bg:#120f0c;--card:#1f1912;
+  --gold:#d4af6a;--gold-light:#f0d798;--green-light:#7a9b7e;
+  --text:#f6f1e7;--text-dim:#a89a86;--border:rgba(255,255,255,0.08);
 }
 body{
   background:
-    radial-gradient(ellipse 700px 460px at 12% -10%, rgba(255,138,61,.18), transparent 60%),
-    radial-gradient(ellipse 600px 420px at 100% 100%, rgba(255,209,102,.10), transparent 55%),
+    radial-gradient(ellipse 700px 460px at 12% -10%, rgba(212,175,106,.16), transparent 60%),
+    radial-gradient(ellipse 600px 420px at 100% 100%, rgba(122,155,126,.10), transparent 55%),
     var(--bg);
-  color:var(--ink);font-family:'Work Sans',system-ui,sans-serif;
+  color:var(--text);font-family:'Quicksand',sans-serif;
   min-height:100vh;display:flex;align-items:center;justify-content:center;padding:2rem;
 }
-.display{font-family:'Bebas Neue',system-ui,sans-serif;letter-spacing:.02em}
-.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+.display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.01em;text-transform:uppercase}
 
 .controls{position:fixed;top:1rem;right:1rem;display:flex;gap:.5rem;z-index:10}
-.controls button,.controls input{font:inherit;font-size:.8rem;padding:.55rem .85rem;border-radius:99px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.controls button,.controls input{font:inherit;font-size:.8rem;padding:.55rem .85rem;border-radius:99px;border:1px solid var(--border);background:var(--card);color:var(--text);cursor:pointer}
 .controls button{transition:border-color .2s,color .2s}
-.controls button:hover{border-color:var(--accent);color:var(--accent)}
+.controls button:hover{border-color:var(--gold);color:var(--gold)}
 
 .poster{
   position:relative;width:100%;max-width:480px;
-  background:var(--surface);border:1px solid var(--line);border-radius:28px;
+  background:var(--card);border:1px solid var(--border);border-radius:28px;
   padding:2.8rem 2.2rem 2.4rem;text-align:center;
   box-shadow:0 30px 80px rgba(0,0,0,.5);
 }
 .notch{position:absolute;top:50%;width:34px;height:34px;background:var(--bg);border-radius:50%;transform:translateY(-50%)}
 .notch.left{left:-17px}
 .notch.right{right:-17px}
-.tear{border:none;border-top:2px dashed var(--line);margin:1.8rem 0;position:relative}
+.tear{border:none;border-top:2px dashed var(--border);margin:1.8rem 0;position:relative}
 
-.eyebrow{font-size:.76rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);margin-bottom:.7rem}
+.eyebrow{font-size:.76rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.7rem}
 h1{font-size:3.4rem;line-height:.95;margin-bottom:.5rem}
-h1 .accent-word{background:linear-gradient(100deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.sub{color:var(--ink-muted);font-size:.98rem;margin-bottom:1.8rem}
+h1 .accent-word{background:linear-gradient(100deg,var(--gold),var(--gold-light));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--text-dim);font-size:.98rem;margin-bottom:1.8rem}
 
 .qr-box{display:inline-block;padding:1rem;background:#fff;border-radius:18px}
 .qr-box img{display:block;width:260px;height:260px;max-width:100%}
 
-.url-line{margin-top:1.4rem;font-size:.8rem;color:var(--ink-muted);word-break:break-all}
-.stub-row{display:flex;justify-content:space-between;font-size:.72rem;color:var(--ink-muted);text-transform:uppercase;letter-spacing:.06em}
-.stub-row b{color:var(--ink);font-weight:700}
+.url-line{margin-top:1.4rem;font-size:.8rem;color:var(--text-dim);word-break:break-all}
+.stub-row{display:flex;justify-content:space-between;font-size:.72rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em}
+.stub-row b{color:var(--text);font-weight:700}
 
 @media print{
   :root{color-scheme:light}
@@ -59,8 +59,8 @@ h1 .accent-word{background:linear-gradient(100deg,var(--accent),var(--accent-2))
   .controls{display:none}
   .poster{background:#fff;box-shadow:none;border:1px solid #E9E1D6;max-width:100%}
   .qr-box{border:1px solid #E9E1D6}
-  .eyebrow{color:#B8135F}
-  h1 .accent-word{-webkit-text-fill-color:#B8135F;background:none}
+  .eyebrow{color:#8a5a1f}
+  h1 .accent-word{-webkit-text-fill-color:#8a5a1f;background:none}
   .sub,.url-line,.stub-row{color:#6B6478}
   .stub-row b{color:#1B1526}
 }
@@ -70,20 +70,20 @@ h1 .accent-word{background:linear-gradient(100deg,var(--accent),var(--accent-2))
 
 <div class="controls">
   <input type="text" id="urlInput" placeholder="URL der Wunsch-Seite" style="width:240px">
-  <button onclick="applyUrl()">Übernehmen</button>
-  <button onclick="window.print()">🖨️ Drucken</button>
+  <button id="applyBtn">Übernehmen</button>
+  <button id="printBtn">🖨️ Drucken</button>
 </div>
 
 <div class="poster">
   <div class="notch left"></div>
   <div class="notch right"></div>
-  <div class="eyebrow">Aula-Abend · Live-Chart</div>
-  <h1 class="display">Musik<span class="accent-word">wünsche</span></h1>
+  <div class="eyebrow">Weihnachtsfest 17.12. · Live-Chart</div>
+  <h1 class="display">Song<span class="accent-word">wünsche</span></h1>
   <p class="sub">QR-Code scannen &amp; deine Songs eintragen — anonym, 30 Sekunden.</p>
   <div class="qr-box">
-    <img id="qrImg" alt="QR-Code zur Musikwunsch-Seite">
+    <img id="qrImg" alt="QR-Code zur Songwunsch-Seite">
   </div>
-  <div class="url-line mono" id="urlLine"></div>
+  <div class="url-line" id="urlLine"></div>
   <hr class="tear">
   <div class="stub-row">
     <span>Wunsch-Tickets <b>3</b> pro Handy</span>
@@ -92,21 +92,25 @@ h1 .accent-word{background:linear-gradient(100deg,var(--accent),var(--accent-2))
 </div>
 
 <script>
-const DEFAULT_URL = "https://6zfcnkkw6n-debug.github.io/Spielereien-/musikwuensche/";
+const STORAGE_KEY = 'weihnachtsfest-poster-url';
 
 function render(url){
   document.getElementById('qrImg').src = 'https://api.qrserver.com/v1/create-qr-code/?size=560x560&margin=8&data=' + encodeURIComponent(url);
-  document.getElementById('urlLine').textContent = url;
+  document.getElementById('urlLine').textContent = url || 'URL rechts oben eintragen und "Übernehmen" klicken';
   document.getElementById('urlInput').value = url;
-  localStorage.setItem('mw_poster_url', url);
+  localStorage.setItem(STORAGE_KEY, url);
 }
 
 function applyUrl(){
   const v = document.getElementById('urlInput').value.trim();
-  if(v) render(v);
+  render(v);
 }
 
-render(localStorage.getItem('mw_poster_url') || DEFAULT_URL);
+document.getElementById('applyBtn').addEventListener('click', applyUrl);
+document.getElementById('printBtn').addEventListener('click', () => window.print());
+document.getElementById('urlInput').addEventListener('keydown', (e) => { if(e.key === 'Enter') applyUrl(); });
+
+render(localStorage.getItem(STORAGE_KEY) || '');
 </script>
 </body>
 </html>

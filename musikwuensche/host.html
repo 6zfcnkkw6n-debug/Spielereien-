@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<title>Weihnachtsfest 17.12. — Host-Bereich</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="../icons/favicon.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#120f0c;
+  --card:#1f1912;
+  --gold:#d4af6a;
+  --gold-light:#f0d798;
+  --green:#3a5a40;
+  --green-light:#7a9b7e;
+  --text:#f6f1e7;
+  --text-dim:#a89a86;
+  --border:rgba(255,255,255,0.08);
+  --danger:#ff6b6b;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);}
+body{font-family:'Quicksand',sans-serif;color:var(--text);min-height:100vh;}
+button{font:inherit;color:inherit;cursor:pointer;}
+.wrap{max-width:760px;margin:0 auto;padding:2.6rem 1.3rem 4rem;}
+.headline{font-family:'Anton',sans-serif;font-weight:400;font-size:2rem;text-transform:uppercase;margin:0 0 .2rem;}
+.sub{color:var(--text-dim);font-size:.9rem;margin:0 0 1.6rem;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:1.4rem;margin-bottom:1.2rem;}
+.field{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:.78rem .9rem;color:var(--text);font:inherit;font-size:.95rem;outline:none;}
+.field:focus{border-color:var(--gold);}
+.btn{
+  width:100%;margin-top:.9rem;background:transparent;border:1.5px solid var(--gold);color:var(--gold);
+  font-family:'Anton',sans-serif;font-size:14px;letter-spacing:.05em;text-transform:uppercase;
+  padding:12px;border-radius:10px;transition:background .15s,color .15s;
+}
+.btn:hover{background:var(--gold);color:#1a1410;}
+.btn-ghost{padding:.55rem .9rem;border-radius:99px;border:1px solid var(--border);background:none;color:var(--text-dim);font-size:.8rem;transition:border-color .2s,color .2s;}
+.btn-ghost:hover{border-color:var(--gold);color:var(--gold);}
+.login-box{max-width:380px;margin:4rem auto;}
+.error-text{font-size:.85rem;color:var(--danger);margin-top:.7rem;display:none;}
+.hidden{display:none;}
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:.6rem;}
+.empty{color:var(--text-dim);font-size:.88rem;padding:1rem 0;text-align:center;}
+
+.row-list{display:flex;flex-direction:column;gap:.55rem;}
+.row-item{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:.9rem;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:.75rem .95rem;}
+.row-item.status-verworfen{opacity:.45;}
+.row-item.status-im_set{border-color:var(--green-light);}
+.rank{font-family:'Anton',sans-serif;font-size:1.6rem;line-height:1;color:var(--text-dim);min-width:1.8ch;text-align:center;}
+.rank.gold{color:var(--gold);}
+.r-info{min-width:0;}
+.r-info b{display:block;font-size:.95rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.r-info span{display:block;color:var(--text-dim);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.votes{font-weight:700;font-size:.98rem;min-width:2ch;text-align:right;}
+.row-actions{display:flex;gap:6px;}
+.host-btn{width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,.05);color:var(--text-dim);font-size:13px;display:flex;align-items:center;justify-content:center;}
+.host-btn.on{color:var(--green-light);border-color:var(--green-light);}
+.host-btn.discard.on{color:var(--danger);border-color:var(--danger);}
+.host-btn.delete:hover{color:var(--danger);border-color:var(--danger);}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div id="loginView" class="login-box card">
+    <h1 class="headline">🔒 Host-Bereich</h1>
+    <p class="sub">Passwort eingeben, um die volle Liste zu sehen und zu kuratieren.</p>
+    <input type="password" id="pwInput" class="field" placeholder="Passwort" autocomplete="off">
+    <button class="btn" id="loginBtn">Anmelden</button>
+    <p class="error-text" id="loginError">Falsches Passwort.</p>
+  </div>
+
+  <div id="appView" class="hidden">
+    <h1 class="headline">🎧 Set-Planung</h1>
+    <p class="sub">Volle Liste, sortiert nach Stimmen. „Verworfen" nimmt den Song aus der öffentlichen Ansicht, „Im Set" markiert ihn dort mit einem Tag.</p>
+
+    <div class="top-bar">
+      <span class="sub" id="statLine" style="margin:0"></span>
+      <div style="display:flex;gap:.5rem">
+        <button class="btn-ghost" id="reloadBtn">↻ Aktualisieren</button>
+        <button class="btn-ghost" id="copyBtn">📋 Liste kopieren</button>
+      </div>
+    </div>
+
+    <div class="row-list" id="rows"><div class="empty">Lädt …</div></div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  const SUPABASE_URL = "https://nacxltgqyijpdezlgwxw.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hY3hsdGdxeWlqcGRlemxnd3h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyNDUyNTQsImV4cCI6MjEwMjgyMTI1NH0.-9bN-QKaBgE2pRbqngDflCD6P9k37DW_ZO4_wqYWl9s";
+  const PW_KEY = 'weihnachtsfest-host-pw';
+  let currentPassword = null;
+  let currentRows = [];
+
+  const el = (id) => document.getElementById(id);
+  const escapeHtml = (s) => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+
+  async function sb(path, opts){
+    const res = await fetch(SUPABASE_URL + path, Object.assign({
+      headers: Object.assign({
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json'
+      }, (opts && opts.headers) || {})
+    }, opts));
+    const data = await res.json().catch(() => null);
+    if(!res.ok){
+      const msg = (data && (data.message || data.hint || data.error)) || res.statusText;
+      throw new Error(msg);
+    }
+    return data;
+  }
+
+  async function login(){
+    const pw = el('pwInput').value;
+    el('loginError').style.display = 'none';
+    try{
+      const rows = await sb('/rest/v1/rpc/host_list_wishes', { method: 'POST', body: JSON.stringify({ p_password: pw }) });
+      currentPassword = pw;
+      sessionStorage.setItem(PW_KEY, pw);
+      el('loginView').classList.add('hidden');
+      el('appView').classList.remove('hidden');
+      renderRows(rows);
+    }catch(e){
+      el('loginError').style.display = 'block';
+    }
+  }
+
+  async function loadAll(){
+    if(!currentPassword) return;
+    try{
+      const rows = await sb('/rest/v1/rpc/host_list_wishes', { method: 'POST', body: JSON.stringify({ p_password: currentPassword }) });
+      renderRows(rows);
+    }catch(e){
+      el('rows').innerHTML = '<div class="empty">Fehler beim Laden.</div>';
+    }
+  }
+
+  function renderRows(rows){
+    currentRows = rows;
+    const list = el('rows');
+    const visible = rows.filter(r => r.status !== 'verworfen').length;
+    el('statLine').textContent = rows.length + ' Wünsche gesamt · ' + visible + ' öffentlich sichtbar';
+    if(!rows.length){ list.innerHTML = '<div class="empty">Noch keine Wünsche.</div>'; return; }
+
+    list.innerHTML = rows.map((r, idx) => {
+      const rankCls = (r.status !== 'verworfen' && idx === 0) ? ' gold' : '';
+      return '<div class="row-item status-'+r.status+'">'
+        + '<div class="rank'+rankCls+'">'+(idx+1)+'</div>'
+        + '<div class="r-info"><b>'+escapeHtml(r.title)+'</b><span>'+escapeHtml(r.artist)+'</span></div>'
+        + '<div class="votes">'+r.votes+'</div>'
+        + '<div class="row-actions">'
+        +   '<button class="host-btn'+(r.status==='im_set'?' on':'')+'" title="Im Set markieren" data-action="im_set" data-id="'+r.id+'">✓</button>'
+        +   '<button class="host-btn discard'+(r.status==='verworfen'?' on':'')+'" title="Verwerfen" data-action="verworfen" data-id="'+r.id+'">✕</button>'
+        +   '<button class="host-btn delete" title="Löschen" data-action="delete" data-id="'+r.id+'">🗑</button>'
+        + '</div></div>';
+    }).join('');
+
+    list.querySelectorAll('[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.getAttribute('data-action');
+        const id = btn.getAttribute('data-id');
+        if(action === 'delete') deleteWish(id);
+        else toggleStatus(id, action);
+      });
+    });
+  }
+
+  async function toggleStatus(id, targetStatus){
+    const row = currentRows.find(r => r.id === id);
+    if(!row) return;
+    const nextStatus = row.status === targetStatus ? 'eingereicht' : targetStatus;
+    try{
+      await sb('/rest/v1/rpc/host_set_status', {
+        method: 'POST',
+        body: JSON.stringify({ p_password: currentPassword, p_id: id, p_status: nextStatus })
+      });
+      loadAll();
+    }catch(e){ alert('Konnte nicht geändert werden.'); }
+  }
+
+  async function deleteWish(id){
+    if(!confirm('Diesen Song wirklich löschen?')) return;
+    try{
+      await sb('/rest/v1/rpc/host_delete_wish', {
+        method: 'POST',
+        body: JSON.stringify({ p_password: currentPassword, p_id: id })
+      });
+      loadAll();
+    }catch(e){ alert('Konnte nicht gelöscht werden.'); }
+  }
+
+  function copyExport(){
+    const visible = currentRows.filter(r => r.status !== 'verworfen').slice().sort((a,b) => b.votes - a.votes);
+    const text = visible.map(r => (r.votes + 'x  ' + r.title + ' — ' + r.artist + (r.status === 'im_set' ? '  [Im Set]' : ''))).join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+      alert('Liste kopiert (' + visible.length + ' Songs).');
+    }).catch(() => {
+      prompt('Manuell kopieren:', text);
+    });
+  }
+
+  el('loginBtn').addEventListener('click', login);
+  el('pwInput').addEventListener('keydown', (e) => { if(e.key === 'Enter') login(); });
+  el('reloadBtn').addEventListener('click', loadAll);
+  el('copyBtn').addEventListener('click', copyExport);
+
+  (function tryAutoLogin(){
+    const saved = sessionStorage.getItem(PW_KEY);
+    if(saved){
+      el('pwInput').value = saved;
+      login();
+    }
+  })();
+})();
+</script>
+</body>
+</html>

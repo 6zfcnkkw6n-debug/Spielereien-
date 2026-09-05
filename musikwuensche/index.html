@@ -3,385 +3,410 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="color-scheme" content="light dark">
-<title>Musikwünsche</title>
-<meta name="theme-color" content="#131019">
-<meta name="description" content="Sag uns, welche Songs auf keinen Fall fehlen dürfen — anonym, in 30 Sekunden.">
+<meta name="color-scheme" content="dark">
+<title>Weihnachtsfest 17.12. — Songwünsche</title>
+<meta name="description" content="Reich deine Songwünsche fürs Weihnachtsfest ein und votet euch gegenseitig hoch — anonym, in 30 Sekunden.">
 <link rel="icon" href="../icons/favicon.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Work+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-
-:root{color-scheme:light dark;
-  --bg:#FBF8F4;--surface:#FFFFFF;--surface-2:#F3EDE3;--surface-glass:rgba(255,255,255,.7);
-  --ink:#221C2E;--ink-muted:#6B6478;--ink-faint:#A79FB0;--line:#E9E1D6;
-  --accent:#FF7A3D;--accent-2:#FFC145;--accent-ink:#221200;
-  --gold:#C9891B;--silver:#8A8194;--bronze:#B06A34;
-  --shadow:0 2px 16px rgba(40,20,10,.06);--shadow-h:0 14px 40px rgba(40,20,10,.12);
-  --nav-bg:rgba(251,248,244,.85);
+:root{
+  --bg:#120f0c;
+  --card:#1f1912;
+  --gold:#d4af6a;
+  --gold-light:#f0d798;
+  --green:#3a5a40;
+  --green-light:#7a9b7e;
+  --text:#f6f1e7;
+  --text-dim:#a89a86;
+  --border:rgba(255,255,255,0.08);
+  --danger:#ff6b6b;
 }
-body.dark{color-scheme:dark;
-  --bg:#131019;--surface:#1D1926;--surface-2:#262032;--surface-glass:rgba(29,25,38,.7);
-  --ink:#F5EFE4;--ink-muted:#A79CB4;--ink-faint:#6E6480;--line:rgba(245,239,228,.12);
-  --accent:#FF8A3D;--accent-2:#FFD166;--accent-ink:#1A1220;
-  --gold:#FFD166;--silver:#C9C2D6;--bronze:#E0A05E;
-  --shadow:0 2px 16px rgba(0,0,0,.3);--shadow-h:0 14px 40px rgba(0,0,0,.5);
-  --nav-bg:rgba(19,16,25,.8);
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);overflow-x:hidden;}
+body{
+  position:relative;
+  font-family:'Quicksand',sans-serif;
+  color:var(--text);
 }
-html{background:var(--bg)}
-body{background:var(--bg);color:var(--ink);font-family:'Work Sans',system-ui,sans-serif;line-height:1.55;min-height:100vh;transition:background-color .4s ease,color .4s ease;overflow-x:hidden}
-.display{font-family:'Bebas Neue',system-ui,sans-serif;letter-spacing:.01em}
-.mono{font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums}
-a{color:inherit}
-button{font:inherit;color:inherit}
-:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:6px}
-
-nav{position:sticky;top:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:.9rem 1.3rem;background:var(--nav-bg);backdrop-filter:blur(16px) saturate(1.6);-webkit-backdrop-filter:blur(16px) saturate(1.6);border-bottom:1px solid var(--line)}
-.nav-title{font-size:1rem;font-weight:600}
-.nav-title span{background:linear-gradient(100deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.theme-btn{width:32px;height:32px;border-radius:50%;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
-.theme-btn:hover{transform:scale(1.08)}
-.theme-btn:active{transform:scale(.9)}
-
-header.hero{position:relative;text-align:center;padding:3.4rem 1.3rem 2.6rem;overflow:hidden}
-.spotlight{position:absolute;inset:0;pointer-events:none;background:conic-gradient(from 0deg at 50% -30%, transparent 0deg, rgba(255,122,61,.14) 40deg, transparent 100deg);animation:sweep 16s linear infinite}
-@keyframes sweep{to{transform:rotate(360deg)}}
-.eyebrow{position:relative;font-size:.74rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin-bottom:.7rem;opacity:0;animation:rise .7s .05s cubic-bezier(.16,1,.3,1) forwards}
-.hero h1{position:relative;font-size:clamp(2.4rem,9vw,3.6rem);line-height:.96;text-wrap:balance;opacity:0;animation:rise .8s .15s cubic-bezier(.16,1,.3,1) forwards}
-.hero h1 .accent-word{background:linear-gradient(100deg,var(--accent),var(--accent-2));-webkit-background-clip:text;background-clip:text;color:transparent}
-.hero p{position:relative;max-width:38ch;margin:.9rem auto 0;color:var(--ink-muted);font-size:.98rem;opacity:0;animation:rise .8s .26s cubic-bezier(.16,1,.3,1) forwards}
-@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
-
-.board{max-width:1000px;margin:0 auto;padding:1.6rem 1.2rem 4.5rem;display:grid;grid-template-columns:340px 1fr;gap:1.4rem;align-items:start}
-@media (max-width:800px){.board{grid-template-columns:1fr}}
-
-.ticket{position:sticky;top:4.6rem;background:var(--surface-glass);backdrop-filter:blur(20px) saturate(1.6);-webkit-backdrop-filter:blur(20px) saturate(1.6);border:1px solid var(--line);border-radius:20px;padding:1.5rem 1.4rem;box-shadow:var(--shadow);opacity:0;transform:translateY(20px);animation:rise .7s .3s cubic-bezier(.16,1,.3,1) forwards}
-@media (max-width:800px){.ticket{position:static}}
-.ticket-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.1rem;padding-bottom:.9rem;border-bottom:1px dashed var(--line)}
-.ticket-head h2{font-size:1.5rem}
-.tickets-left{font-size:.7rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em}
-
-.field{position:relative;margin-bottom:.85rem}
-.field label{display:block;font-size:.66rem;font-weight:700;color:var(--ink-faint);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.35rem}
-.field input{width:100%;padding:.78rem .9rem;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:.94rem;transition:border-color .25s,box-shadow .25s}
-.field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent)}
-.field input::placeholder{color:var(--ink-faint)}
-
-.suggest{position:absolute;left:0;right:0;top:calc(100% + 6px);background:var(--surface-glass);backdrop-filter:blur(20px) saturate(1.6);-webkit-backdrop-filter:blur(20px) saturate(1.6);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow-h);overflow:hidden;z-index:60;max-height:0;opacity:0;pointer-events:none;transition:max-height .35s cubic-bezier(.16,1,.3,1),opacity .2s}
-.suggest.open{max-height:240px;opacity:1;pointer-events:auto}
-.suggest-item{padding:.6rem .85rem;font-size:.88rem;cursor:pointer;transition:background-color .15s}
-.suggest-item+.suggest-item{border-top:1px solid var(--line)}
-.suggest-item:hover{background:color-mix(in srgb, var(--accent) 10%, transparent)}
-.suggest-item b{display:block;font-weight:600}
-.suggest-item small{display:block;color:var(--ink-muted);font-size:.78rem}
-
-.stamp-btn{width:100%;margin-top:.3rem;padding:.85rem 1rem;border-radius:12px;border:2px solid var(--accent);background:transparent;color:var(--accent);font-size:1.05rem;letter-spacing:.03em;cursor:pointer;transition:transform .25s cubic-bezier(.34,1.56,.64,1),background-color .25s,color .25s}
-.stamp-btn:hover{background:var(--accent);color:var(--accent-ink)}
-.stamp-btn:active{transform:scale(.96) rotate(-.6deg)}
-.stamp-btn:disabled{opacity:.4;cursor:default;background:transparent;color:var(--accent)}
-
-.msg{font-size:.82rem;border-radius:10px;padding:.6rem .8rem;margin-top:.7rem;display:none}
-.msg.ok{display:block;background:color-mix(in srgb, var(--accent) 14%, transparent);color:var(--accent)}
-.msg.err{display:block;background:rgba(226,64,90,.14);color:#E2405A}
-.ticket-hint{text-align:center;font-size:.76rem;color:var(--ink-faint);margin-top:.7rem}
-
-.chart-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.9rem;padding:0 .1rem;opacity:0;transform:translateY(18px);animation:rise .7s .4s cubic-bezier(.16,1,.3,1) forwards}
-.chart-head h2{font-size:1.6rem}
-.chart-head span{font-size:.78rem;color:var(--ink-muted)}
-
-.chart-list{display:flex;flex-direction:column;gap:.55rem}
-.chart-row{position:relative;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:.9rem;background:var(--surface-glass);backdrop-filter:blur(20px) saturate(1.6);-webkit-backdrop-filter:blur(20px) saturate(1.6);border:1px solid var(--line);border-radius:16px;padding:.8rem 1rem;overflow:hidden;transition:transform .5s cubic-bezier(.16,1,.3,1),border-color .3s,box-shadow .3s}
-.chart-row:hover{border-color:color-mix(in srgb, var(--accent) 45%, var(--line));box-shadow:var(--shadow-h);transform:translateY(-2px)}
-.chart-row .bar{position:absolute;left:0;top:0;bottom:0;background:linear-gradient(90deg, color-mix(in srgb, var(--accent) 16%, transparent), color-mix(in srgb, var(--accent-2) 6%, transparent));width:0%;transition:width .8s cubic-bezier(.16,1,.3,1);z-index:0}
-.chart-row>*{position:relative;z-index:1}
-.rank{font-size:1.9rem;line-height:1;color:var(--ink-faint);min-width:1.6ch;text-align:center}
-.rank.gold{color:var(--gold)}
-.rank.silver{color:var(--silver)}
-.rank.bronze{color:var(--bronze)}
-.row-info{min-width:0}
-.row-info b{display:block;font-size:.96rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.row-info span{display:block;color:var(--ink-muted);font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.vote-btn{display:flex;align-items:center;gap:.5rem;border:1px solid var(--line);background:var(--surface-2);border-radius:99px;padding:.42rem .85rem .42rem .65rem;cursor:pointer;transition:transform .3s cubic-bezier(.34,1.56,.64,1),border-color .3s,background-color .3s}
-.vote-btn:hover{transform:translateY(-2px);border-color:var(--accent)}
-.vote-btn:active{transform:scale(.94)}
-.vote-btn.voted{border-color:var(--accent);background:color-mix(in srgb, var(--accent) 14%, var(--surface-2))}
-.vote-plus{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--accent);color:var(--accent-ink);font-weight:700;font-size:.8rem;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
-.vote-btn.voted .vote-plus{transform:rotate(45deg)}
-.vote-count{font-size:.94rem;font-weight:700;min-width:2ch;text-align:right}
-.vote-count.pulse{animation:pulseNum .4s cubic-bezier(.34,1.56,.64,1)}
-@keyframes pulseNum{0%{transform:scale(1)}45%{transform:scale(1.3)}100%{transform:scale(1)}}
-.empty{color:var(--ink-muted);font-size:.88rem;text-align:center;padding:1.2rem 0}
-
-footer{max-width:1000px;margin:0 auto;text-align:center;color:var(--ink-faint);font-size:.76rem;padding:0 1.3rem 3rem}
-
-@media (prefers-reduced-motion: reduce){
-  *{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.001ms !important}
+.app{
+  position:relative;
+  max-width:480px;
+  margin:0 auto;
+  padding:28px 20px 60px;
 }
+.snowfield{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0; }
+.flake{ position:absolute; top:-10%; color:rgba(240,215,152,0.35); font-size:14px; animation:fall linear infinite; }
+@keyframes fall{ to{ transform:translateY(115vh); } }
+@media (prefers-reduced-motion: reduce){ .flake{ animation:none; display:none; } }
+
+.eyebrow{
+  position:relative; z-index:1;
+  font-weight:700;
+  letter-spacing:.08em;
+  font-size:12px;
+  color:var(--gold-light);
+  text-transform:uppercase;
+  margin-bottom:10px;
+  display:flex; align-items:center; gap:6px;
+}
+.headline{
+  position:relative; z-index:1;
+  font-family:'Anton',sans-serif;
+  font-weight:400;
+  font-size:38px;
+  line-height:1.06;
+  letter-spacing:.01em;
+  margin:0 0 14px;
+  text-transform:uppercase;
+}
+.headline .accent{
+  background:linear-gradient(90deg,var(--gold),var(--gold-light));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.sub{
+  position:relative; z-index:1;
+  font-size:15px;
+  line-height:1.5;
+  color:var(--text-dim);
+  margin:0 0 28px;
+  max-width:36ch;
+}
+.card{
+  position:relative; z-index:1;
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:28px;
+}
+.submit-head{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; }
+.submit-title{ font-family:'Anton',sans-serif; font-size:19px; letter-spacing:.02em; text-transform:uppercase; }
+.tickets-badge{ font-weight:700; font-size:13px; color:var(--gold); letter-spacing:.04em; white-space:nowrap; }
+.divider{ border-top:1px dashed var(--border); margin-bottom:18px; }
+.field-label{ display:block; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); margin-bottom:6px; }
+.field{
+  width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:10px;
+  padding:12px 14px; color:var(--text); font-family:'Quicksand',sans-serif; font-size:15px; margin-bottom:16px;
+  outline:none; transition:border-color .15s;
+}
+.field:focus{ border-color:var(--gold); }
+.field::placeholder{ color:var(--text-dim); }
+.field:disabled{ opacity:.4; }
+.submit-btn{
+  width:100%; background:transparent; border:1.5px solid var(--gold); color:var(--gold);
+  font-family:'Anton',sans-serif; font-size:15px; letter-spacing:.05em; text-transform:uppercase;
+  padding:14px; border-radius:10px; cursor:pointer; transition:background .15s, color .15s;
+}
+.submit-btn:hover:not(:disabled){ background:var(--gold); color:#1a1410; }
+.submit-btn:disabled{ opacity:.4; cursor:not-allowed; border-color:var(--text-dim); color:var(--text-dim); }
+.helper{ font-size:13px; color:var(--text-dim); margin:12px 0 0; text-align:center; }
+.error-text{ font-size:13px; color:var(--danger); margin:10px 0 0; text-align:center; display:none; }
+.chart-header{ position:relative; z-index:1; display:flex; justify-content:space-between; align-items:center; margin-bottom:16px; }
+.chart-title{ font-family:'Anton',sans-serif; font-size:23px; letter-spacing:.02em; text-transform:uppercase; }
+.chart-meta{ display:flex; align-items:center; gap:10px; color:var(--text-dim); font-size:13px; }
+.refresh-btn{
+  background:rgba(255,255,255,0.06); border:1px solid var(--border); color:var(--text);
+  width:30px;height:30px; border-radius:50%; cursor:pointer; font-size:15px;
+  display:flex;align-items:center;justify-content:center; transition:transform .3s;
+}
+.refresh-btn:active{ transform:rotate(180deg); }
+.chart-list{ position:relative; z-index:1; display:flex; flex-direction:column; gap:12px; }
+.chart-item{
+  display:flex; align-items:center; gap:14px; background:var(--card); border:1px solid var(--border);
+  border-radius:14px; padding:16px 18px; will-change:transform,opacity;
+}
+.chart-item.leader{
+  border-color:var(--gold);
+  background:linear-gradient(120deg, rgba(212,175,106,0.14), var(--card) 60%);
+  box-shadow:0 0 26px rgba(212,175,106,.14);
+}
+.chart-item.in-set{ border-color:var(--green-light); }
+.chart-item.enter{ animation:enter .32s ease both; }
+@keyframes enter{ from{ opacity:0; transform:translateY(8px); } to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){ .chart-item{ transition:none !important; animation:none !important; } }
+.rank{ font-family:'Anton',sans-serif; font-size:28px; width:32px; flex-shrink:0; }
+.rank.gold{ color:var(--gold); }
+.rank.green{ color:var(--green-light); }
+.song-info{ flex:1; min-width:0; }
+.song-title{ font-weight:700; font-size:16px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.song-artist{ font-size:13px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:flex; gap:6px; align-items:center; }
+.in-set-tag{ font-size:11px; color:var(--green-light); font-weight:700; flex-shrink:0; }
+.item-actions{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.vote-btn{
+  display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.06); border:1px solid var(--border);
+  border-radius:999px; padding:6px; cursor:pointer;
+}
+.vote-plus{ width:24px;height:24px; border-radius:50%; background:var(--gold); color:#1a1410; display:flex;align-items:center;justify-content:center; font-weight:700; font-size:15px; }
+.vote-count{ font-weight:700; font-size:15px; min-width:20px; text-align:center; padding-right:6px; display:inline-block; transition:transform .15s; }
+.vote-count.bump{ transform:scale(1.3); }
+.more-btn{
+  width:100%; margin-top:14px; background:transparent; border:1px dashed var(--border); color:var(--text-dim);
+  padding:12px; border-radius:10px; cursor:pointer; font-size:13px; font-weight:600;
+}
+.more-btn:hover{ border-color:var(--gold); color:var(--gold); }
+.empty-state{ position:relative; z-index:1; text-align:center; padding:36px 20px; color:var(--text-dim); font-size:14px; border:1px dashed var(--border); border-radius:14px; }
+.footer-note{ position:relative; z-index:1; text-align:center; font-size:12px; color:var(--text-dim); margin-top:32px; letter-spacing:.02em; }
+.footer-note a{ color:var(--text-dim); }
+.loading{ position:relative; z-index:1; text-align:center; color:var(--text-dim); padding:40px 0; font-size:14px; }
 </style>
 </head>
 <body>
 
-<nav>
-  <span class="nav-title">🎤 <span>Musikwünsche</span></span>
-  <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" aria-label="Hell/Dunkel umschalten">🌙</button>
-</nav>
+<div class="snowfield" id="snowfield"></div>
+<div class="app">
+  <div class="eyebrow"><span>❆</span> Live-Chart · Weihnachtsfest 17.12.</div>
+  <h1 class="headline">Das Set<br><span class="accent">entsteht hier</span></h1>
+  <p class="sub">Reich deine Wünsche ein, votet euch gegenseitig hoch — die Top-Songs landen garantiert im Set.</p>
 
-<header class="hero">
-  <div class="spotlight"></div>
-  <div class="eyebrow">Aula-Abend · Vorab-Wünsche</div>
-  <h1 class="display">Das Set <span class="accent-word">entsteht hier</span></h1>
-  <p>Trag bis zu 3 Songs ein und stimm für andere mit ab — komplett anonym, wir bauen daraus vorab das Set.</p>
-</header>
-
-<div class="board">
-  <div class="ticket">
-    <div class="ticket-head">
-      <h2 class="display">Wunsch einreichen</h2>
-      <span class="tickets-left" id="ticketsLeft">3 Tickets</span>
+  <div class="card">
+    <div class="submit-head">
+      <span class="submit-title">Wunsch einreichen</span>
+      <span class="tickets-badge" id="ticketsBadge">3 Tickets</span>
     </div>
-    <div class="field">
-      <label for="titleInput">Titel</label>
-      <input id="titleInput" type="text" autocomplete="off" placeholder="z. B. Blinding Lights">
-      <div class="suggest" id="titleSuggest"></div>
-    </div>
-    <div class="field">
-      <label for="artistInput">Interpret</label>
-      <input id="artistInput" type="text" autocomplete="off" placeholder="z. B. The Weeknd">
-      <div class="suggest" id="artistSuggest"></div>
-    </div>
-    <button class="stamp-btn display" id="submitBtn" onclick="submitWish()">Ticket einlösen</button>
-    <div class="msg" id="formMsg"></div>
-    <div class="ticket-hint" id="ticketHint">Noch 3 von 3 Wunsch-Tickets übrig.</div>
+    <div class="divider"></div>
+    <label class="field-label" for="titleInput">Titel</label>
+    <input id="titleInput" class="field" placeholder="z. B. Blinding Lights" maxlength="120" />
+    <label class="field-label" for="artistInput">Interpret</label>
+    <input id="artistInput" class="field" placeholder="z. B. The Weeknd" maxlength="120" />
+    <button id="submitBtn" class="submit-btn">Ticket einlösen</button>
+    <p class="helper" id="helperText"></p>
+    <p class="error-text" id="errorText"></p>
   </div>
 
-  <div>
-    <div class="chart-head">
-      <h2 class="display">Live-Chart</h2>
-      <span id="chartCount"></span>
+  <div class="chart-header">
+    <span class="chart-title">Live-Chart</span>
+    <div class="chart-meta">
+      <span id="songCount">– Songs im Rennen</span>
+      <button id="refreshBtn" class="refresh-btn" title="Aktualisieren">⟳</button>
     </div>
-    <div class="chart-list" id="chartList"><div class="empty">Lädt …</div></div>
   </div>
+
+  <div id="chartList" class="loading">Lädt …</div>
+  <p class="footer-note">Anonym · kein Login · nur für die Set-Planung.</p>
 </div>
 
-<footer>Anonym · kein Login · Daten werden nur für die Set-Planung genutzt.</footer>
-
 <script>
-const SUPABASE_URL = "https://nacxltgqyijpdezlgwxw.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hY3hsdGdxeWlqcGRlemxnd3h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyNDUyNTQsImV4cCI6MjEwMjgyMTI1NH0.-9bN-QKaBgE2pRbqngDflCD6P9k37DW_ZO4_wqYWl9s";
-const MAX_WISHES = 3;
-const rankClass = ['gold','silver','bronze'];
+(function(){
+  const SUPABASE_URL = "https://nacxltgqyijpdezlgwxw.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5hY3hsdGdxeWlqcGRlemxnd3h3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyNDUyNTQsImV4cCI6MjEwMjgyMTI1NH0.-9bN-QKaBgE2pRbqngDflCD6P9k37DW_ZO4_wqYWl9s";
+  const PAGE_SIZE = 50;
+  const MAX_TICKETS = 3;
+  const POLL_MS = 15000;
+  const TICKETS_KEY = 'weihnachtsfest-tickets-used';
+  const VOTED_KEY = 'weihnachtsfest-voted-ids'; // reserved for a future per-person vote lock, see voteFor()
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-function toggleTheme(){
-  document.body.classList.toggle('dark');
-  const isDark=document.body.classList.contains('dark');
-  document.getElementById('themeBtn').textContent=isDark?'☀️':'🌙';
-  localStorage.setItem('mw_theme',isDark?'dark':'light');
-}
-(function initTheme(){
-  const saved=localStorage.getItem('mw_theme');
-  const wantDark=saved?saved==='dark':(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);
-  if(wantDark){
-    document.body.classList.add('dark');
-    window.addEventListener('DOMContentLoaded',()=>{document.getElementById('themeBtn').textContent='☀️';});
-  }
-})();
+  let wishes = [];
+  let lastVotedId = null;
+  let visibleCount = PAGE_SIZE;
 
-function getDeviceToken(){
-  let t = localStorage.getItem('mw_device');
-  if(!t){
-    t = (crypto.randomUUID ? crypto.randomUUID() : (Date.now()+'-'+Math.random().toString(36).slice(2)));
-    localStorage.setItem('mw_device', t);
-  }
-  return t;
-}
-function getLocalCount(){ return parseInt(localStorage.getItem('mw_count')||'0',10); }
-function bumpLocalCount(){ localStorage.setItem('mw_count', String(getLocalCount()+1)); updateTicketUI(); }
-function getVoted(){ try{ return JSON.parse(localStorage.getItem('mw_voted')||'[]'); }catch(e){ return []; } }
-function markVoted(id){ const v=getVoted(); if(!v.includes(id)){ v.push(id); localStorage.setItem('mw_voted', JSON.stringify(v)); } }
+  const el = (id) => document.getElementById(id);
+  const escapeHtml = (s) => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
 
-function updateTicketUI(){
-  const left = Math.max(0, MAX_WISHES - getLocalCount());
-  const hint = document.getElementById('ticketHint');
-  const btn = document.getElementById('submitBtn');
-  const leftBadge = document.getElementById('ticketsLeft');
-  leftBadge.textContent = left + (left===1 ? ' Ticket' : ' Tickets');
-  if(left <= 0){
-    hint.textContent = 'Danke! Du hast schon ' + MAX_WISHES + ' Wünsche abgegeben.';
-    btn.disabled = true;
-  } else {
-    hint.textContent = 'Noch ' + left + ' von ' + MAX_WISHES + ' Wunsch-Tickets übrig.';
-    btn.disabled = false;
-  }
-}
-
-async function sb(path, opts){
-  const res = await fetch(SUPABASE_URL + path, Object.assign({
-    headers: Object.assign({
-      'apikey': SUPABASE_ANON_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json'
-    }, (opts&&opts.headers)||{})
-  }, opts));
-  const data = await res.json().catch(()=>null);
-  if(!res.ok){
-    const msg = (data && (data.message||data.hint||data.error)) || res.statusText;
-    throw new Error(msg);
-  }
-  return data;
-}
-
-let mbAbort = null;
-async function searchMusicBrainz(term){
-  if(mbAbort) mbAbort.abort();
-  mbAbort = new AbortController();
-  const url = 'https://musicbrainz.org/ws/2/recording/?query=' + encodeURIComponent(term) + '&fmt=json&limit=8';
-  const res = await fetch(url, { signal: mbAbort.signal });
-  if(!res.ok) throw new Error('musicbrainz error');
-  const data = await res.json();
-  return (data.recordings||[]).map(r => ({
-    title: r.title,
-    artist: (r['artist-credit'] && r['artist-credit'][0] && r['artist-credit'][0].name) || '',
-    mbid: r.id
-  })).filter(r => r.artist);
-}
-
-function debounce(fn, ms){
-  let t;
-  return (...args) => { clearTimeout(t); t = setTimeout(()=>fn(...args), ms); };
-}
-
-function wireAutocomplete(inputEl, suggestEl){
-  const run = debounce(async () => {
-    const term = inputEl.value.trim();
-    if(term.length < 2){ suggestEl.classList.remove('open'); suggestEl.innerHTML=''; return; }
-    try{
-      const results = await searchMusicBrainz(term);
-      if(!results.length){ suggestEl.classList.remove('open'); suggestEl.innerHTML=''; return; }
-      suggestEl.innerHTML = results.map((r,i) =>
-        '<div class="suggest-item" data-i="'+i+'"><b>'+escapeHtml(r.title)+'</b><small>'+escapeHtml(r.artist)+'</small></div>'
-      ).join('');
-      suggestEl.classList.add('open');
-      Array.from(suggestEl.children).forEach((el,i) => {
-        el.addEventListener('click', () => {
-          document.getElementById('titleInput').value = results[i].title;
-          document.getElementById('artistInput').value = results[i].artist;
-          document.getElementById('titleInput').dataset.mbid = results[i].mbid;
-          suggestEl.classList.remove('open');
-        });
-      });
-    }catch(e){ /* MusicBrainz nicht erreichbar - stiller Fallback auf manuelle Eingabe */ }
-  }, 450);
-  inputEl.addEventListener('input', () => { delete document.getElementById('titleInput').dataset.mbid; run(); });
-  inputEl.addEventListener('blur', () => setTimeout(()=>suggestEl.classList.remove('open'), 150));
-}
-
-function escapeHtml(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
-
-async function submitWish(){
-  const titleEl = document.getElementById('titleInput');
-  const artistEl = document.getElementById('artistInput');
-  const msgEl = document.getElementById('formMsg');
-  const title = titleEl.value.trim();
-  const artist = artistEl.value.trim();
-  msgEl.className = 'msg';
-  if(!title || !artist){
-    msgEl.textContent = 'Bitte Titel und Interpret ausfüllen.';
-    msgEl.className = 'msg err';
-    return;
-  }
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  try{
-    const row = await sb('/rest/v1/rpc/submit_song', {
-      method: 'POST',
-      body: JSON.stringify({
-        p_artist: artist,
-        p_title: title,
-        p_mbid: titleEl.dataset.mbid || null,
-        p_device_token: getDeviceToken()
-      })
-    });
-    bumpLocalCount();
-    titleEl.value=''; artistEl.value=''; delete titleEl.dataset.mbid;
-    msgEl.textContent = 'Danke, dein Wunsch ist gespeichert! 🎉';
-    msgEl.className = 'msg ok';
-    loadList(row && row.id);
-  }catch(e){
-    if(String(e.message).includes('limit_reached')){
-      localStorage.setItem('mw_count', String(MAX_WISHES));
-      msgEl.textContent = 'Du hast schon ' + MAX_WISHES + ' Wünsche abgegeben — danke!';
-    } else {
-      msgEl.textContent = 'Konnte nicht gespeichert werden. Nochmal versuchen?';
+  if(!reduceMotion){
+    const field = el('snowfield');
+    for(let i=0;i<14;i++){
+      const f = document.createElement('span');
+      f.className = 'flake';
+      f.textContent = '❆';
+      f.style.left = Math.random()*100 + '%';
+      f.style.fontSize = (10 + Math.random()*10) + 'px';
+      f.style.animationDuration = (14 + Math.random()*14) + 's';
+      f.style.animationDelay = (Math.random()*14) + 's';
+      field.appendChild(f);
     }
-    msgEl.className = 'msg err';
   }
-  updateTicketUI();
-}
 
-async function upvote(id){
-  if(getVoted().includes(id)) return;
-  try{
-    await sb('/rest/v1/rpc/upvote_song', {
-      method: 'POST',
-      body: JSON.stringify({ p_request_id: id, p_device_token: getDeviceToken() })
-    });
-  }catch(e){ /* evtl. schon gevotet - trotzdem lokal markieren */ }
-  markVoted(id);
-  loadList(id);
-}
-
-async function loadList(justChangedId){
-  const listEl = document.getElementById('chartList');
-  const countEl = document.getElementById('chartCount');
-  let rows;
-  try{
-    rows = await sb('/rest/v1/song_requests_public?select=*&order=votes.desc,created_at.asc', { method: 'GET' });
-  }catch(e){
-    listEl.innerHTML = '<div class="empty">Liste konnte nicht geladen werden.</div>';
-    return;
+  async function sb(path, opts){
+    const res = await fetch(SUPABASE_URL + path, Object.assign({
+      headers: Object.assign({
+        'apikey': SUPABASE_ANON_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+        'Content-Type': 'application/json'
+      }, (opts && opts.headers) || {})
+    }, opts));
+    const data = await res.json().catch(() => null);
+    if(!res.ok){
+      const msg = (data && (data.message || data.hint || data.error)) || res.statusText;
+      throw new Error(msg);
+    }
+    return data;
   }
-  countEl.textContent = rows.length + (rows.length===1 ? ' Song im Rennen' : ' Songs im Rennen');
-  if(!rows.length){ listEl.innerHTML = '<div class="empty">Noch keine Wünsche — sei der/die Erste!</div>'; return; }
 
-  const existing = Array.from(listEl.querySelectorAll('.chart-row'));
-  const firstRects = {};
-  existing.forEach(r => { firstRects[r.dataset.id] = r.getBoundingClientRect(); });
+  function getTicketsUsed(){ return parseInt(localStorage.getItem(TICKETS_KEY) || '0', 10); }
+  function bumpTicketsUsed(){ localStorage.setItem(TICKETS_KEY, String(getTicketsUsed() + 1)); }
 
-  const max = rows[0].votes || 1;
-  const voted = getVoted();
-  listEl.innerHTML = rows.map((r, idx) => {
-    const isVoted = voted.includes(r.id);
-    const rc = rankClass[idx] ? ' ' + rankClass[idx] : '';
-    return '<div class="chart-row" data-id="'+r.id+'">'
-      + '<div class="bar" style="width:'+(r.votes/max*100)+'%"></div>'
-      + '<div class="rank display'+rc+'">'+(idx+1)+'</div>'
-      + '<div class="row-info"><b>'+escapeHtml(r.title)+'</b><span>'+escapeHtml(r.artist)+'</span></div>'
-      + '<button class="vote-btn'+(isVoted?' voted':'')+'" onclick="upvote(\''+r.id+'\')">'
-      + '<span class="vote-plus">'+(isVoted?'✓':'+')+'</span>'
-      + '<span class="vote-count mono'+(r.id===justChangedId?' pulse':'')+'">'+r.votes+'</span></button></div>';
-  }).join('');
+  function showError(msg){
+    const errorEl = el('errorText');
+    errorEl.textContent = msg;
+    errorEl.style.display = 'block';
+    setTimeout(() => { errorEl.style.display = 'none'; }, 4000);
+  }
 
-  listEl.querySelectorAll('.chart-row').forEach(row => {
-    const first = firstRects[row.dataset.id];
-    if(!first) return;
-    const last = row.getBoundingClientRect();
-    const dy = first.top - last.top;
-    if(Math.abs(dy) < 1) return;
-    row.style.transition = 'none';
-    row.style.transform = 'translateY('+dy+'px)';
-    requestAnimationFrame(() => {
-      row.style.transition = 'transform .5s cubic-bezier(.16,1,.3,1)';
-      row.style.transform = '';
+  function renderTickets(){
+    const remaining = Math.max(0, MAX_TICKETS - getTicketsUsed());
+    el('ticketsBadge').textContent = remaining + ' Ticket' + (remaining === 1 ? '' : 's');
+    el('helperText').textContent = remaining > 0
+      ? `Noch ${remaining} von ${MAX_TICKETS} Wunsch-Tickets übrig.`
+      : 'Keine Wunsch-Tickets mehr übrig.';
+    const btn = el('submitBtn');
+    const inputs = [el('titleInput'), el('artistInput')];
+    btn.disabled = remaining <= 0;
+    inputs.forEach(i => i.disabled = remaining <= 0);
+  }
+
+  function renderChart(){
+    const listEl = el('chartList');
+    const before = new Map();
+    if(!reduceMotion){
+      listEl.querySelectorAll('.chart-item').forEach(item => {
+        const id = item.getAttribute('data-item-id');
+        if(id) before.set(id, item.getBoundingClientRect());
+      });
+    }
+
+    const sorted = wishes.slice().sort((a, b) => b.votes - a.votes || new Date(a.created_at) - new Date(b.created_at));
+    el('songCount').textContent = sorted.length + (sorted.length === 1 ? ' Song im Rennen' : ' Songs im Rennen');
+
+    if(sorted.length === 0){
+      listEl.className = 'empty-state';
+      listEl.innerHTML = 'Noch keine Wünsche eingereicht — sei die oder der Erste!';
+      return;
+    }
+
+    const shown = sorted.slice(0, Math.min(visibleCount, sorted.length));
+
+    listEl.className = 'chart-list';
+    listEl.innerHTML = shown.map((w, i) => {
+      const isLeader = i === 0;
+      const inSet = w.status === 'im_set';
+      const rankColor = i % 2 === 0 ? 'gold' : 'green';
+      const bump = w.id === lastVotedId ? 'bump' : '';
+      const isNew = !before.has(w.id) && before.size > 0;
+      return `
+        <div class="chart-item ${isLeader ? 'leader' : ''} ${inSet ? 'in-set' : ''} ${isNew ? 'enter' : ''}" data-item-id="${w.id}">
+          <div class="rank ${rankColor}">${i + 1}</div>
+          <div class="song-info">
+            <div class="song-title">${escapeHtml(w.title)}</div>
+            <div class="song-artist">${escapeHtml(w.artist)} ${inSet ? '<span class="in-set-tag">✓ Im Set</span>' : ''}</div>
+          </div>
+          <div class="item-actions">
+            <button class="vote-btn" data-vote-id="${w.id}">
+              <span class="vote-count ${bump}">${w.votes}</span>
+              <span class="vote-plus">+</span>
+            </button>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    if(sorted.length > visibleCount){
+      const moreBtn = document.createElement('button');
+      moreBtn.className = 'more-btn';
+      moreBtn.textContent = `Weitere anzeigen (${sorted.length - visibleCount} übrig)`;
+      moreBtn.addEventListener('click', () => {
+        visibleCount += PAGE_SIZE;
+        renderChart();
+      });
+      listEl.appendChild(moreBtn);
+    }
+
+    listEl.querySelectorAll('.vote-btn').forEach(btn => {
+      btn.addEventListener('click', () => voteFor(btn.getAttribute('data-vote-id')));
     });
+
+    if(!reduceMotion){
+      listEl.querySelectorAll('.chart-item').forEach(item => {
+        const id = item.getAttribute('data-item-id');
+        const oldRect = before.get(id);
+        if(!oldRect) return;
+        const newRect = item.getBoundingClientRect();
+        const deltaY = oldRect.top - newRect.top;
+        if(deltaY){
+          item.style.transform = `translateY(${deltaY}px)`;
+          item.style.transition = 'none';
+          requestAnimationFrame(() => {
+            item.style.transition = 'transform 320ms ease';
+            item.style.transform = '';
+          });
+        }
+      });
+    }
+
+    lastVotedId = null;
+  }
+
+  async function loadWishes(){
+    try{
+      wishes = await sb('/rest/v1/wishes_public?select=*', { method: 'GET' });
+    }catch(e){
+      wishes = [];
+    }
+  }
+
+  async function voteFor(id){
+    // Später nachrüstbar: hier vor dem Request gegen eine in localStorage[VOTED_KEY]
+    // gespeicherte Liste bereits gevoteter IDs prüfen, um Mehrfach-Voting pro Person zu sperren.
+    const w = wishes.find(w => w.id === id);
+    if(!w) return;
+    w.votes += 1;
+    lastVotedId = id;
+    renderChart();
+    try{
+      await sb('/rest/v1/rpc/vote_wish', { method: 'POST', body: JSON.stringify({ p_id: id }) });
+    }catch(e){ /* optimistisches Update bleibt bestehen, nächster Poll gleicht ab */ }
+  }
+
+  async function submitWish(){
+    const titleInput = el('titleInput');
+    const artistInput = el('artistInput');
+    const title = titleInput.value.trim();
+    const artist = artistInput.value.trim();
+
+    if(!title || !artist){ showError('Bitte Titel und Interpret angeben.'); return; }
+    if(getTicketsUsed() >= MAX_TICKETS){ showError('Keine Wunsch-Tickets mehr übrig.'); return; }
+
+    const btn = el('submitBtn');
+    btn.disabled = true;
+    try{
+      const row = await sb('/rest/v1/rpc/submit_wish', {
+        method: 'POST',
+        body: JSON.stringify({ p_title: title, p_artist: artist })
+      });
+      bumpTicketsUsed();
+      titleInput.value = '';
+      artistInput.value = '';
+      lastVotedId = row.id;
+      await loadWishes();
+      renderChart();
+    }catch(e){
+      showError('Konnte nicht gespeichert werden. Nochmal versuchen?');
+    }
+    renderTickets();
+  }
+
+  async function refreshAll(){
+    await loadWishes();
+    renderChart();
+  }
+
+  el('submitBtn').addEventListener('click', submitWish);
+  el('refreshBtn').addEventListener('click', refreshAll);
+  [el('titleInput'), el('artistInput')].forEach(input => {
+    input.addEventListener('keydown', (e) => { if(e.key === 'Enter') submitWish(); });
   });
-}
 
-wireAutocomplete(document.getElementById('titleInput'), document.getElementById('titleSuggest'));
-wireAutocomplete(document.getElementById('artistInput'), document.getElementById('artistSuggest'));
-updateTicketUI();
-loadList();
+  (async function init(){
+    renderTickets();
+    await loadWishes();
+    renderChart();
+    setInterval(refreshAll, POLL_MS);
+  })();
+})();
 </script>
 </body>
 </html>
