@@ -88,14 +88,28 @@ body{
 .tickets-badge{ font-weight:700; font-size:13px; color:var(--gold); letter-spacing:.04em; white-space:nowrap; }
 .divider{ border-top:1px dashed var(--border); margin-bottom:18px; }
 .field-label{ display:block; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--text-dim); margin-bottom:6px; }
+.field-group{ position:relative; margin-bottom:16px; }
 .field{
   width:100%; background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:10px;
-  padding:12px 14px; color:var(--text); font-family:'Quicksand',sans-serif; font-size:15px; margin-bottom:16px;
+  padding:12px 14px; color:var(--text); font-family:'Quicksand',sans-serif; font-size:15px;
   outline:none; transition:border-color .15s;
 }
 .field:focus{ border-color:var(--gold); }
 .field::placeholder{ color:var(--text-dim); }
 .field:disabled{ opacity:.4; }
+.suggest{
+  position:absolute; left:0; right:0; top:calc(100% + 6px);
+  background:var(--card); border:1px solid var(--border); border-radius:10px;
+  box-shadow:0 14px 40px rgba(0,0,0,.4); overflow:hidden; z-index:20;
+  max-height:0; opacity:0; pointer-events:none;
+  transition:max-height .3s ease, opacity .2s;
+}
+.suggest.open{ max-height:240px; opacity:1; pointer-events:auto; overflow-y:auto; }
+.suggest-item{ padding:.6rem .85rem; font-size:.88rem; cursor:pointer; transition:background-color .15s; }
+.suggest-item+.suggest-item{ border-top:1px solid var(--border); }
+.suggest-item:hover{ background:rgba(212,175,106,0.12); }
+.suggest-item b{ display:block; font-weight:700; font-size:14px; }
+.suggest-item small{ display:block; color:var(--text-dim); font-size:12px; }
 .submit-btn{
   width:100%; background:transparent; border:1.5px solid var(--gold); color:var(--gold);
   font-family:'Anton',sans-serif; font-size:15px; letter-spacing:.05em; text-transform:uppercase;
@@ -168,10 +182,16 @@ body{
       <span class="tickets-badge" id="ticketsBadge">3 Tickets</span>
     </div>
     <div class="divider"></div>
-    <label class="field-label" for="titleInput">Titel</label>
-    <input id="titleInput" class="field" placeholder="z. B. Blinding Lights" maxlength="120" />
-    <label class="field-label" for="artistInput">Interpret</label>
-    <input id="artistInput" class="field" placeholder="z. B. The Weeknd" maxlength="120" />
+    <div class="field-group">
+      <label class="field-label" for="titleInput">Titel</label>
+      <input id="titleInput" class="field" placeholder="z. B. Blinding Lights" maxlength="120" autocomplete="off" />
+      <div class="suggest" id="titleSuggest"></div>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="artistInput">Interpret</label>
+      <input id="artistInput" class="field" placeholder="z. B. The Weeknd" maxlength="120" autocomplete="off" />
+      <div class="suggest" id="artistSuggest"></div>
+    </div>
     <button id="submitBtn" class="submit-btn">Ticket einlösen</button>
     <p class="helper" id="helperText"></p>
     <p class="error-text" id="errorText"></p>
@@ -340,6 +360,49 @@ body{
     lastVotedId = null;
   }
 
+  function debounce(fn, ms){
+    let t;
+    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+  }
+
+  async function searchMusicBrainz(term, signal){
+    const url = 'https://musicbrainz.org/ws/2/recording/?query=' + encodeURIComponent(term) + '&fmt=json&limit=8';
+    const res = await fetch(url, { signal });
+    if(!res.ok) throw new Error('musicbrainz error');
+    const data = await res.json();
+    return (data.recordings || []).map(r => ({
+      title: r.title,
+      artist: (r['artist-credit'] && r['artist-credit'][0] && r['artist-credit'][0].name) || ''
+    })).filter(r => r.artist);
+  }
+
+  function wireAutocomplete(inputEl, suggestEl){
+    let abortCtrl = null;
+    const run = debounce(async () => {
+      const term = inputEl.value.trim();
+      if(term.length < 2){ suggestEl.classList.remove('open'); suggestEl.innerHTML = ''; return; }
+      if(abortCtrl) abortCtrl.abort();
+      abortCtrl = new AbortController();
+      try{
+        const results = await searchMusicBrainz(term, abortCtrl.signal);
+        if(!results.length){ suggestEl.classList.remove('open'); suggestEl.innerHTML = ''; return; }
+        suggestEl.innerHTML = results.map((r, i) =>
+          `<div class="suggest-item" data-i="${i}"><b>${escapeHtml(r.title)}</b><small>${escapeHtml(r.artist)}</small></div>`
+        ).join('');
+        suggestEl.classList.add('open');
+        Array.from(suggestEl.children).forEach((item, i) => {
+          item.addEventListener('click', () => {
+            el('titleInput').value = results[i].title;
+            el('artistInput').value = results[i].artist;
+            suggestEl.classList.remove('open');
+          });
+        });
+      }catch(e){ /* MusicBrainz nicht erreichbar oder Suche abgebrochen — stiller Fallback auf manuelle Eingabe */ }
+    }, 450);
+    inputEl.addEventListener('input', run);
+    inputEl.addEventListener('blur', () => setTimeout(() => suggestEl.classList.remove('open'), 150));
+  }
+
   async function loadWishes(){
     try{
       wishes = await sb('/rest/v1/wishes_public?select=*', { method: 'GET' });
@@ -399,6 +462,9 @@ body{
   [el('titleInput'), el('artistInput')].forEach(input => {
     input.addEventListener('keydown', (e) => { if(e.key === 'Enter') submitWish(); });
   });
+
+  wireAutocomplete(el('titleInput'), el('titleSuggest'));
+  wireAutocomplete(el('artistInput'), el('artistSuggest'));
 
   (async function init(){
     renderTickets();
