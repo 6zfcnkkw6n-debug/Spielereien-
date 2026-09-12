@@ -1,7 +1,15 @@
 [build]
   publish = "."
 
+[functions]
+  directory = "netlify/functions"
+
 [[redirects]]
   from = "/host"
   to = "/host.html"
+  status = 200
+
+[[redirects]]
+  from = "/api/search-music"
+  to = "/.netlify/functions/search-music"
   status = 200

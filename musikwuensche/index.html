@@ -96,6 +96,21 @@ body{
 .field:focus{ border-color:var(--gold); }
 .field::placeholder{ color:var(--text-dim); }
 .field:disabled{ opacity:.4; }
+.search-wrap{ position:relative; }
+.search-field{ font-size:16px; }
+.suggestions{
+  position:absolute; left:0; right:0; top:calc(100% + 6px); z-index:20;
+  background:var(--card); border:1px solid var(--border); border-radius:12px;
+  max-height:320px; overflow-y:auto; box-shadow:0 12px 30px rgba(0,0,0,.4);
+}
+.suggestion-item{ display:flex; align-items:center; gap:10px; padding:10px 12px; cursor:pointer; border-bottom:1px solid var(--border); }
+.suggestion-item:last-child{ border-bottom:none; }
+.suggestion-item:hover, .suggestion-item.active{ background:rgba(255,255,255,0.06); }
+.suggestion-art{ width:38px; height:38px; border-radius:6px; flex-shrink:0; background:rgba(255,255,255,0.06); object-fit:cover; }
+.suggestion-info{ min-width:0; flex:1; }
+.suggestion-title{ font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.suggestion-artist{ font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.suggestion-empty, .suggestion-loading{ padding:14px 12px; font-size:13px; color:var(--text-dim); text-align:center; }
 .submit-btn{
   width:100%; background:transparent; border:1.5px solid var(--gold); color:var(--gold);
   font-family:'Anton',sans-serif; font-size:15px; letter-spacing:.05em; text-transform:uppercase;
@@ -168,6 +183,11 @@ body{
       <span class="tickets-badge" id="ticketsBadge">3 Tickets</span>
     </div>
     <div class="divider"></div>
+    <label class="field-label" for="songSearchInput">Song oder Interpret suchen</label>
+    <div class="search-wrap" id="searchWrap">
+      <input id="songSearchInput" class="field search-field" placeholder="🔎 Song oder Interpret suchen…" autocomplete="off" maxlength="100" />
+      <div id="searchSuggestions" class="suggestions" hidden></div>
+    </div>
     <label class="field-label" for="titleInput">Titel</label>
     <input id="titleInput" class="field" placeholder="z. B. Blinding Lights" maxlength="120" />
     <label class="field-label" for="artistInput">Interpret</label>
@@ -254,9 +274,120 @@ body{
       ? `Noch ${remaining} von ${MAX_TICKETS} Wunsch-Tickets übrig.`
       : 'Keine Wunsch-Tickets mehr übrig.';
     const btn = el('submitBtn');
-    const inputs = [el('titleInput'), el('artistInput')];
+    const inputs = [el('songSearchInput'), el('titleInput'), el('artistInput')];
     btn.disabled = remaining <= 0;
     inputs.forEach(i => i.disabled = remaining <= 0);
+    if(remaining <= 0) closeSuggestions();
+  }
+
+  const SEARCH_DEBOUNCE_MS = 300;
+  let searchAbortController = null;
+  let searchDebounceTimer = null;
+  let activeSuggestionIndex = -1;
+  let currentSuggestions = [];
+
+  function scoreResult(query, r){
+    const q = query.trim().toLowerCase();
+    const title = (r.title || '').toLowerCase();
+    const artist = (r.artist || '').toLowerCase();
+    let score = 0;
+    if(title === q) score += 1000;
+    else if(title.startsWith(q)) score += 700;
+    else if(title.includes(q)) score += 400;
+    if(artist === q) score += 600;
+    else if(artist.startsWith(q)) score += 350;
+    else if(artist.includes(q)) score += 150;
+    return score;
+  }
+
+  function closeSuggestions(){
+    const box = el('searchSuggestions');
+    box.hidden = true;
+    box.innerHTML = '';
+    currentSuggestions = [];
+    activeSuggestionIndex = -1;
+  }
+
+  function selectSuggestion(index){
+    const r = currentSuggestions[index];
+    if(!r) return;
+    el('titleInput').value = r.title.slice(0, 120);
+    el('artistInput').value = r.artist.slice(0, 120);
+    el('songSearchInput').value = `${r.title} — ${r.artist}`;
+    closeSuggestions();
+  }
+
+  function renderSuggestions(items, state){
+    const box = el('searchSuggestions');
+    activeSuggestionIndex = -1;
+    currentSuggestions = items;
+
+    if(state === 'loading'){
+      box.innerHTML = '<div class="suggestion-loading">Suche …</div>';
+      box.hidden = false;
+      return;
+    }
+    if(state === 'error'){
+      box.innerHTML = '<div class="suggestion-empty">Suche gerade nicht möglich — Titel &amp; Interpret unten manuell eintragen.</div>';
+      box.hidden = false;
+      return;
+    }
+    if(!items.length){
+      box.innerHTML = '<div class="suggestion-empty">Keine Treffer — Titel &amp; Interpret unten manuell eintragen.</div>';
+      box.hidden = false;
+      return;
+    }
+
+    box.innerHTML = items.map((r, i) => `
+      <div class="suggestion-item" data-index="${i}">
+        ${r.artwork ? `<img class="suggestion-art" src="${r.artwork}" alt="" loading="lazy" onerror="this.remove()">` : ''}
+        <div class="suggestion-info">
+          <div class="suggestion-title">${escapeHtml(r.title)}</div>
+          <div class="suggestion-artist">${escapeHtml(r.artist)}</div>
+        </div>
+      </div>
+    `).join('');
+    box.hidden = false;
+
+    box.querySelectorAll('.suggestion-item').forEach(item => {
+      item.addEventListener('click', () => selectSuggestion(parseInt(item.getAttribute('data-index'), 10)));
+    });
+  }
+
+  async function runSearch(query){
+    if(searchAbortController) searchAbortController.abort();
+    searchAbortController = new AbortController();
+    renderSuggestions([], 'loading');
+    try{
+      const res = await fetch('/api/search-music?q=' + encodeURIComponent(query), { signal: searchAbortController.signal });
+      const data = await res.json().catch(() => null);
+      if(!res.ok || !data){ renderSuggestions([], 'error'); return; }
+      const sorted = (data.results || []).slice().sort((a, b) => scoreResult(query, b) - scoreResult(query, a));
+      renderSuggestions(sorted.slice(0, 8), 'ok');
+    }catch(e){
+      if(e.name === 'AbortError') return;
+      renderSuggestions([], 'error');
+    }
+  }
+
+  function onSearchInput(){
+    const query = el('songSearchInput').value.trim();
+    clearTimeout(searchDebounceTimer);
+    if(!query){
+      if(searchAbortController) searchAbortController.abort();
+      closeSuggestions();
+      return;
+    }
+    searchDebounceTimer = setTimeout(() => runSearch(query), SEARCH_DEBOUNCE_MS);
+  }
+
+  function moveActiveSuggestion(delta){
+    const box = el('searchSuggestions');
+    const items = box.querySelectorAll('.suggestion-item');
+    if(!items.length) return;
+    activeSuggestionIndex = (activeSuggestionIndex + delta + items.length) % items.length;
+    items.forEach((it, i) => it.classList.toggle('active', i === activeSuggestionIndex));
+    items[activeSuggestionIndex].scrollIntoView({ block: 'nearest' });
   }
 
   function renderChart(){
@@ -380,6 +511,8 @@ body{
       bumpTicketsUsed();
       titleInput.value = '';
       artistInput.value = '';
+      el('songSearchInput').value = '';
+      closeSuggestions();
       lastVotedId = row.id;
       await loadWishes();
       renderChart();
@@ -398,6 +531,21 @@ body{
   el('refreshBtn').addEventListener('click', refreshAll);
   [el('titleInput'), el('artistInput')].forEach(input => {
     input.addEventListener('keydown', (e) => { if(e.key === 'Enter') submitWish(); });
+  });
+
+  el('songSearchInput').addEventListener('input', onSearchInput);
+  el('songSearchInput').addEventListener('keydown', (e) => {
+    if(e.key === 'ArrowDown'){ e.preventDefault(); moveActiveSuggestion(1); }
+    else if(e.key === 'ArrowUp'){ e.preventDefault(); moveActiveSuggestion(-1); }
+    else if(e.key === 'Enter'){
+      e.preventDefault();
+      if(activeSuggestionIndex >= 0) selectSuggestion(activeSuggestionIndex);
+      else if(currentSuggestions.length) selectSuggestion(0);
+    }
+    else if(e.key === 'Escape'){ closeSuggestions(); }
+  });
+  document.addEventListener('click', (e) => {
+    if(!el('searchWrap').contains(e.target)) closeSuggestions();
   });
 
   (async function init(){
