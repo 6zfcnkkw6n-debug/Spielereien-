@@ -151,7 +151,7 @@ body{
 }
 .wish-celebration.show{ opacity:1; visibility:visible; }
 .wc-rays{
-  position:absolute; top:6%; left:50%; width:520px; height:520px; margin-left:-260px;
+  position:absolute; top:5%; left:50%; width:520px; height:520px; margin-left:-260px;
   background:conic-gradient(from 0deg,
     transparent 0deg, rgba(240,215,152,.35) 6deg, transparent 14deg, transparent 40deg,
     rgba(212,175,106,.28) 46deg, transparent 54deg, transparent 90deg, rgba(240,215,152,.3) 96deg,
@@ -160,44 +160,98 @@ body{
     rgba(212,175,106,.28) 306deg, transparent 314deg);
   border-radius:50%; opacity:0; transform:scale(.4) rotate(0deg);
 }
-.wish-celebration.show .wc-rays{ animation: wc-rays-spin 1.9s ease-out forwards; }
+.wish-celebration.show .wc-rays{ animation: wc-rays-spin 3s ease-out forwards; }
 @keyframes wc-rays-spin{
   0%{ opacity:0; transform:scale(.4) rotate(0deg); }
-  15%{ opacity:1; transform:scale(1) rotate(30deg); }
-  100%{ opacity:0; transform:scale(1.15) rotate(140deg); }
+  12%{ opacity:1; transform:scale(1) rotate(20deg); }
+  100%{ opacity:0; transform:scale(1.2) rotate(150deg); }
 }
-.wc-ball{ position:relative; margin-top:9%; transform:translateY(-160px); }
-.wish-celebration.show .wc-ball{ animation: wc-drop 1.9s cubic-bezier(.24,.86,.4,1.15) forwards; }
+.wc-ball-rig{ position:relative; margin-top:8%; transform:translateY(-190px); }
+.wish-celebration.show .wc-ball-rig{ animation: wc-drop 3s cubic-bezier(.24,.86,.4,1.1) forwards; }
 @keyframes wc-drop{
-  0%{ transform:translateY(-160px); }
-  55%{ transform:translateY(14px); }
-  70%{ transform:translateY(2px); }
-  85%{ transform:translateY(8px); }
-  100%{ transform:translateY(-180px); }
+  0%{ transform:translateY(-190px); }
+  40%{ transform:translateY(10px); }
+  50%{ transform:translateY(0); }
+  58%{ transform:translateY(6px); }
+  90%{ transform:translateY(2px); }
+  100%{ transform:translateY(-210px); }
 }
-.wc-ball-string{ width:2px; height:40px; background:var(--border); margin:0 auto; }
+.wc-ball-hook{ width:8px; height:8px; margin:0 auto; border:2px solid var(--text-dim); border-radius:50%; background:transparent; }
+.wc-ball-string{ width:2px; height:30px; background:linear-gradient(var(--text-dim), var(--border)); margin:0 auto; }
+.wc-ball-3d{ perspective:240px; margin:0 auto; width:74px; }
 .wc-ball-sphere{
-  position:relative; width:64px; height:64px; border-radius:50%; margin:0 auto;
-  background:repeating-conic-gradient(from 0deg, var(--gold-light) 0deg 9deg, var(--gold) 9deg 18deg);
-  box-shadow:0 0 30px rgba(240,215,152,.55), inset -6px -6px 14px rgba(0,0,0,.35), inset 6px 6px 10px rgba(255,255,255,.25);
-  animation: wc-ball-spin 2.6s linear infinite;
+  position:relative; width:74px; height:74px; border-radius:50%; margin:0 auto;
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255,255,255,.95), rgba(255,255,255,0) 24%),
+    repeating-linear-gradient(55deg, rgba(255,255,255,.5) 0 2px, rgba(40,44,48,.4) 2px 9px),
+    repeating-linear-gradient(-55deg, rgba(255,255,255,.32) 0 2px, rgba(20,22,25,.45) 2px 9px),
+    radial-gradient(circle at 50% 45%, #dde1e3, #9aa1a6 55%, #52565a 100%);
+  box-shadow:
+    0 0 32px rgba(240,215,152,.45),
+    inset -10px -10px 18px rgba(0,0,0,.5),
+    inset 8px 8px 14px rgba(255,255,255,.3);
+  transform-style:preserve-3d;
 }
-@keyframes wc-ball-spin{ to{ transform:rotate(360deg); } }
-.wc-ball-topper{ position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-size:20px; line-height:1; }
+.wish-celebration.show .wc-ball-sphere{
+  animation: wc-ball-spin3d 3s linear infinite, wc-ball-facet-shift 1.8s linear infinite;
+}
+@keyframes wc-ball-spin3d{
+  0%{ transform:rotateY(0deg) rotateX(6deg); }
+  100%{ transform:rotateY(360deg) rotateX(6deg); }
+}
+@keyframes wc-ball-facet-shift{
+  0%{ background-position:0 0, 0 0, 0 0, 0 0; }
+  100%{ background-position:0 0, 126px 0, -126px 0, 0 0; }
+}
+.wc-ball-topper{ position:absolute; top:-40px; left:50%; transform:translateX(-50%); font-size:20px; line-height:1; }
+.wc-leds{ position:absolute; top:8%; left:50%; width:0; height:0; }
+.wc-led{
+  position:absolute; top:0; left:0; width:6px; height:6px; border-radius:50%;
+  background:var(--dot-color, var(--gold-light));
+  box-shadow:0 0 9px 2px var(--dot-color, var(--gold-light));
+  opacity:0;
+  transform:translate(-50%,-50%) rotate(var(--a)) translateX(0) rotate(calc(-1 * var(--a)));
+}
+.wish-celebration.show .wc-led{
+  animation:wc-led-fly 3s ease-out forwards;
+  animation-delay:var(--delay, 0s);
+}
+@keyframes wc-led-fly{
+  0%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateX(0) rotate(calc(-1 * var(--a))); }
+  10%{ opacity:1; }
+  75%{ opacity:.7; }
+  100%{ opacity:0; transform:translate(-50%,-50%) rotate(var(--a)) translateX(var(--d)) rotate(calc(-1 * var(--a))); }
+}
 .wc-message{
-  margin-top:14px; font-family:'Anton',sans-serif; font-size:16px; letter-spacing:.03em;
+  margin-top:18px; font-family:'Anton',sans-serif; font-size:16px; letter-spacing:.03em;
   color:var(--gold-light); text-transform:uppercase; text-shadow:0 2px 12px rgba(0,0,0,.5);
   opacity:0; transform:translateY(6px);
 }
-.wish-celebration.show .wc-message{ animation: wc-message-in .5s ease .35s forwards; }
+.wish-celebration.show .wc-message{ animation: wc-message-in .5s ease .5s forwards; }
 @keyframes wc-message-in{ to{ opacity:1; transform:none; } }
 @media (prefers-reduced-motion: reduce){
   .wish-celebration.show .wc-rays{ display:none; }
-  .wc-ball-sphere{ animation:none; }
-  .wish-celebration.show .wc-ball{ animation:none; transform:translateY(0); margin-top:6%; }
+  .wish-celebration.show .wc-ball-sphere{ animation:none; }
+  .wish-celebration.show .wc-ball-rig{ animation:none; transform:translateY(0); margin-top:6%; }
+  .wish-celebration.show .wc-led{ animation:none; display:none; }
   .wish-celebration.show .wc-message{ animation:none; opacity:1; transform:none; }
 }
 /* === WISH-CELEBRATION: END === */
+
+/* === WISH-RETRACT: START (leicht entfernbar) === */
+.retract-bar{
+  display:flex; align-items:center; justify-content:space-between; gap:10px;
+  margin-top:10px; padding:8px 12px; background:rgba(255,255,255,0.04);
+  border:1px dashed var(--border); border-radius:10px; font-size:12.5px; color:var(--text-dim);
+}
+.retract-bar[hidden]{ display:none; }
+.retract-btn{
+  background:none; border:none; color:var(--gold-light); font-weight:700; font-size:12.5px;
+  cursor:pointer; padding:0; flex-shrink:0; font-family:'Quicksand',sans-serif;
+}
+.retract-btn:hover{ text-decoration:underline; }
+.retract-btn:disabled{ opacity:.5; cursor:default; text-decoration:none; }
+/* === WISH-RETRACT: END === */
 .submit-btn{
   width:100%; background:transparent; border:1.5px solid var(--gold); color:var(--gold);
   font-family:'Anton',sans-serif; font-size:15px; letter-spacing:.05em; text-transform:uppercase;
@@ -263,11 +317,15 @@ body{
 <!-- WISH-CELEBRATION: START (leicht entfernbar) -->
 <div class="wish-celebration" id="wishCelebration" aria-hidden="true">
   <div class="wc-rays"></div>
-  <div class="wc-ball">
+  <div class="wc-ball-rig">
+    <div class="wc-ball-hook"></div>
     <div class="wc-ball-string"></div>
-    <div class="wc-ball-sphere">
-      <div class="wc-ball-topper">🎄</div>
+    <div class="wc-ball-3d">
+      <div class="wc-ball-sphere">
+        <div class="wc-ball-topper">🎄</div>
+      </div>
     </div>
+    <div class="wc-leds" id="wcLeds"></div>
   </div>
   <div class="wc-message">🎶 Dein Wunsch ist im Rennen!</div>
 </div>
@@ -296,6 +354,12 @@ body{
     <button id="submitBtn" class="submit-btn">Ticket einlösen</button>
     <p class="helper" id="helperText"></p>
     <p class="error-text" id="errorText"></p>
+    <!-- WISH-RETRACT: START (leicht entfernbar) -->
+    <div class="retract-bar" id="retractBar" hidden>
+      <span id="retractText"></span>
+      <button type="button" id="retractBtn" class="retract-btn">↩ Zurücknehmen</button>
+    </div>
+    <!-- WISH-RETRACT: END -->
   </div>
 
   <!-- GENRE-CHIPS: START (leicht entfernbar) -->
@@ -606,17 +670,93 @@ body{
   // === GENRE-CHIPS: END ===
 
   // === WISH-CELEBRATION: START (leicht entfernbar) ===
+  const LED_COLORS = ['var(--gold-light)', 'var(--gold)', '#eef3f6', '#cfe1ee'];
+  const LED_COUNT = 12;
+
+  function buildDiscoLeds(){
+    const container = el('wcLeds');
+    if(!container) return;
+    let html = '';
+    for(let i = 0; i < LED_COUNT; i++){
+      const angle = (360 / LED_COUNT) * i + (Math.random() * 14 - 7);
+      const dist = 62 + Math.random() * 58;
+      const delay = (Math.random() * 0.5).toFixed(2);
+      const color = LED_COLORS[i % LED_COLORS.length];
+      html += `<span class="wc-led" style="--a:${angle.toFixed(1)}deg; --d:${dist.toFixed(0)}px; --delay:${delay}s; --dot-color:${color};"></span>`;
+    }
+    container.innerHTML = html;
+  }
+
   let celebrationHideTimer = null;
   function celebrateWishSubmitted(){
     const box = el('wishCelebration');
     if(!box) return;
     clearTimeout(celebrationHideTimer);
     box.classList.remove('show');
+    if(!reduceMotion) buildDiscoLeds();
     void box.offsetWidth; // Reflow erzwingen, damit die Animation bei schnellem erneuten Trigger neu startet
     box.classList.add('show');
-    celebrationHideTimer = setTimeout(() => box.classList.remove('show'), reduceMotion ? 1400 : 2100);
+    celebrationHideTimer = setTimeout(() => box.classList.remove('show'), reduceMotion ? 1400 : 3100);
   }
   // === WISH-CELEBRATION: END ===
+
+  // === WISH-RETRACT: START (leicht entfernbar) ===
+  let retractState = null;
+
+  function clearRetractUI(){
+    if(retractState){
+      clearTimeout(retractState.hideTimer);
+      clearInterval(retractState.tickInterval);
+    }
+    retractState = null;
+    const bar = el('retractBar');
+    if(bar) bar.hidden = true;
+  }
+
+  function showRetractUI(row){
+    clearRetractUI();
+    if(!row || !row.last_retract_token || !row.last_retract_expires_at) return;
+    const expiresAt = new Date(row.last_retract_expires_at).getTime();
+    const bar = el('retractBar');
+    const textEl = el('retractText');
+    if(!bar || !textEl || isNaN(expiresAt)) return;
+
+    function tick(){
+      const remaining = Math.max(0, Math.round((expiresAt - Date.now()) / 1000));
+      if(remaining <= 0){ clearRetractUI(); return; }
+      const mm = Math.floor(remaining / 60);
+      const ss = String(remaining % 60).padStart(2, '0');
+      textEl.textContent = `„${row.title}“ eingetragen — noch ${mm}:${ss} zum Zurücknehmen`;
+    }
+    tick();
+    const tickInterval = setInterval(tick, 1000);
+    const hideTimer = setTimeout(clearRetractUI, Math.max(0, expiresAt - Date.now()) + 500);
+
+    retractState = { id: row.id, token: row.last_retract_token, tickInterval, hideTimer };
+    bar.hidden = false;
+  }
+
+  async function retractLastWish(){
+    if(!retractState) return;
+    const { id, token } = retractState;
+    const btn = el('retractBtn');
+    btn.disabled = true;
+    try{
+      await sb('/rest/v1/rpc/retract_wish', {
+        method: 'POST',
+        body: JSON.stringify({ p_id: id, p_retract_token: token })
+      });
+      clearRetractUI();
+      localStorage.setItem(TICKETS_KEY, String(Math.max(0, getTicketsUsed() - 1)));
+      renderTickets();
+      await loadWishes();
+      renderChart();
+    }catch(e){
+      showError('Konnte nicht zurückgenommen werden — Zeitfenster ist evtl. abgelaufen.');
+    }
+    btn.disabled = false;
+  }
+  // === WISH-RETRACT: END ===
 
   function renderChart(){
     const listEl = el('chartList');
@@ -745,6 +885,7 @@ body{
       await loadWishes();
       renderChart();
       celebrateWishSubmitted(); // WISH-CELEBRATION
+      showRetractUI(row); // WISH-RETRACT
     }catch(e){
       showError('Konnte nicht gespeichert werden. Nochmal versuchen?');
     }
@@ -757,6 +898,7 @@ body{
   }
 
   el('submitBtn').addEventListener('click', submitWish);
+  el('retractBtn').addEventListener('click', retractLastWish); // WISH-RETRACT
   el('refreshBtn').addEventListener('click', refreshAll);
   [el('titleInput'), el('artistInput')].forEach(input => {
     input.addEventListener('keydown', (e) => { if(e.key === 'Enter') submitWish(); });
