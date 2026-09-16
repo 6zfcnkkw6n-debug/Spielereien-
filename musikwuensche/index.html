@@ -111,6 +111,22 @@ body{
 .suggestion-title{ font-weight:700; font-size:14px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .suggestion-artist{ font-size:12px; color:var(--text-dim); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .suggestion-empty, .suggestion-loading{ padding:14px 12px; font-size:13px; color:var(--text-dim); text-align:center; }
+/* === GENRE-CHIPS: START (leicht entfernbar) === */
+.genre-hint{ font-size:13px; color:var(--text-dim); margin:0 0 14px; text-align:left; }
+.genre-grid{ display:flex; flex-wrap:wrap; gap:10px; }
+.genre-chip{
+  display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:left;
+  background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:12px;
+  padding:10px 14px; cursor:pointer; font-family:'Quicksand',sans-serif; color:var(--text);
+  transition:background .15s, border-color .15s;
+}
+.genre-chip:hover{ border-color:var(--gold-light); }
+.genre-chip.active{ background:linear-gradient(120deg, rgba(212,175,106,.22), rgba(212,175,106,.08)); border-color:var(--gold); }
+.genre-chip:disabled{ opacity:.6; cursor:default; }
+.genre-label{ font-weight:700; font-size:14px; }
+.genre-example{ font-size:11px; color:var(--text-dim); }
+.genre-chip.active .genre-example{ color:var(--gold-light); }
+/* === GENRE-CHIPS: END === */
 .submit-btn{
   width:100%; background:transparent; border:1.5px solid var(--gold); color:var(--gold);
   font-family:'Anton',sans-serif; font-size:15px; letter-spacing:.05em; text-transform:uppercase;
@@ -196,6 +212,17 @@ body{
     <p class="helper" id="helperText"></p>
     <p class="error-text" id="errorText"></p>
   </div>
+
+  <!-- GENRE-CHIPS: START (leicht entfernbar) -->
+  <div class="card" id="genreCard">
+    <div class="submit-head">
+      <span class="submit-title">Welche Richtung darf's sein?</span>
+    </div>
+    <div class="divider"></div>
+    <p class="genre-hint">Mehrfachauswahl möglich — hilft bei der Set-Planung.</p>
+    <div class="genre-grid" id="genreGrid"></div>
+  </div>
+  <!-- GENRE-CHIPS: END -->
 
   <div class="chart-header">
     <span class="chart-title">Live-Chart</span>
@@ -390,6 +417,70 @@ body{
     items[activeSuggestionIndex].scrollIntoView({ block: 'nearest' });
   }
 
+  // === GENRE-CHIPS: START (leicht entfernbar) ===
+  const GENRE_DEVICE_KEY = 'weihnachtsfest-genre-device-token';
+  const GENRE_SELECTED_KEY = 'weihnachtsfest-genre-selected';
+  const GENRES = [
+    { slug: 'charts_pop', label: 'Charts / Pop', example: 'Blinding Lights – The Weeknd' },
+    { slug: 'hiphop_rnb', label: 'Hip-Hop / R&B', example: 'Sicko Mode – Travis Scott' },
+    { slug: 'techno_edm', label: 'Techno / EDM', example: 'Losing It – Fisher' },
+    { slug: 'rock_alternative', label: 'Rock / Alternative', example: 'Mr. Brightside – The Killers' },
+    { slug: 'schlager_party', label: 'Schlager / Party', example: 'Atemlos durch die Nacht – Helene Fischer' },
+    { slug: 'retro_90s2000s', label: '90er / 2000er', example: 'Cotton Eye Joe – Rednex' },
+    { slug: 'latin_reggaeton', label: 'Latin / Reggaeton', example: 'Despacito – Luis Fonsi' },
+    { slug: 'christmas', label: 'Weihnachten', example: 'All I Want for Christmas Is You – Mariah Carey' },
+  ];
+
+  function getGenreDeviceToken(){
+    let token = localStorage.getItem(GENRE_DEVICE_KEY);
+    if(!token){
+      token = crypto.randomUUID();
+      localStorage.setItem(GENRE_DEVICE_KEY, token);
+    }
+    return token;
+  }
+
+  function getSelectedGenres(){
+    try{ return new Set(JSON.parse(localStorage.getItem(GENRE_SELECTED_KEY) || '[]')); }
+    catch(e){ return new Set(); }
+  }
+
+  function saveSelectedGenres(set){
+    localStorage.setItem(GENRE_SELECTED_KEY, JSON.stringify(Array.from(set)));
+  }
+
+  function renderGenreGrid(){
+    const grid = el('genreGrid');
+    if(!grid) return;
+    const selected = getSelectedGenres();
+    grid.innerHTML = GENRES.map(g => `
+      <button type="button" class="genre-chip ${selected.has(g.slug) ? 'active' : ''}" data-genre="${g.slug}">
+        <span class="genre-label">${escapeHtml(g.label)}</span>
+        <span class="genre-example">z. B. ${escapeHtml(g.example)}</span>
+      </button>
+    `).join('');
+    grid.querySelectorAll('.genre-chip').forEach(btn => {
+      btn.addEventListener('click', () => toggleGenre(btn.getAttribute('data-genre'), btn));
+    });
+  }
+
+  async function toggleGenre(slug, btnEl){
+    btnEl.disabled = true;
+    try{
+      const rows = await sb('/rest/v1/rpc/vote_genre', {
+        method: 'POST',
+        body: JSON.stringify({ p_genre: slug, p_device_token: getGenreDeviceToken() })
+      });
+      const row = Array.isArray(rows) ? rows[0] : rows;
+      const selected = getSelectedGenres();
+      if(row && row.selected) selected.add(slug); else selected.delete(slug);
+      saveSelectedGenres(selected);
+      btnEl.classList.toggle('active', !!(row && row.selected));
+    }catch(e){ /* kein Effekt bei Fehler, Chip bleibt im vorherigen Zustand */ }
+    btnEl.disabled = false;
+  }
+  // === GENRE-CHIPS: END ===
+
   function renderChart(){
     const listEl = el('chartList');
     const before = new Map();
@@ -550,6 +641,7 @@ body{
 
   (async function init(){
     renderTickets();
+    renderGenreGrid(); // GENRE-CHIPS
     await loadWishes();
     renderChart();
     setInterval(refreshAll, POLL_MS);

@@ -62,6 +62,14 @@ button{font:inherit;color:inherit;cursor:pointer;}
 .host-btn.on{color:var(--green-light);border-color:var(--green-light);}
 .host-btn.discard.on{color:var(--danger);border-color:var(--danger);}
 .host-btn.delete:hover{color:var(--danger);border-color:var(--danger);}
+
+/* === GENRE-CHIPS: START (leicht entfernbar) === */
+.genre-bar-row{display:flex;align-items:center;gap:.7rem;padding:.35rem 0;}
+.genre-bar-label{width:150px;flex-shrink:0;font-size:.85rem;}
+.genre-bar-track{flex:1;height:8px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;}
+.genre-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:99px;}
+.genre-bar-count{width:2.4ch;text-align:right;font-weight:700;font-size:.85rem;flex-shrink:0;}
+/* === GENRE-CHIPS: END === */
 </style>
 </head>
 <body>
@@ -87,6 +95,13 @@ button{font:inherit;color:inherit;cursor:pointer;}
         <button class="btn-ghost" id="copyBtn">📋 Liste kopieren</button>
       </div>
     </div>
+
+    <!-- GENRE-CHIPS: START (leicht entfernbar) -->
+    <div class="card" id="genreStatsCard">
+      <div class="sub" style="margin-bottom:.8rem">🎶 Genre-Richtung der Gäste</div>
+      <div id="genreStats"><div class="empty">Lädt …</div></div>
+    </div>
+    <!-- GENRE-CHIPS: END -->
 
     <div class="row-list" id="rows"><div class="empty">Lädt …</div></div>
   </div>
@@ -130,6 +145,7 @@ button{font:inherit;color:inherit;cursor:pointer;}
       el('loginView').classList.add('hidden');
       el('appView').classList.remove('hidden');
       renderRows(rows);
+      loadGenreStats(); // GENRE-CHIPS
     }catch(e){
       el('loginError').style.display = 'block';
     }
@@ -143,7 +159,51 @@ button{font:inherit;color:inherit;cursor:pointer;}
     }catch(e){
       el('rows').innerHTML = '<div class="empty">Fehler beim Laden.</div>';
     }
+    loadGenreStats(); // GENRE-CHIPS
   }
+
+  // === GENRE-CHIPS: START (leicht entfernbar) ===
+  const GENRE_LABELS = {
+    charts_pop: 'Charts / Pop',
+    hiphop_rnb: 'Hip-Hop / R&B',
+    techno_edm: 'Techno / EDM',
+    rock_alternative: 'Rock / Alternative',
+    schlager_party: 'Schlager / Party',
+    retro_90s2000s: '90er / 2000er',
+    latin_reggaeton: 'Latin / Reggaeton',
+    christmas: 'Weihnachten',
+  };
+  const GENRE_ORDER = Object.keys(GENRE_LABELS);
+
+  async function loadGenreStats(){
+    try{
+      const rows = await sb('/rest/v1/genre_votes_public?select=*', { method: 'GET' });
+      renderGenreStats(rows);
+    }catch(e){
+      const box = el('genreStats');
+      if(box) box.innerHTML = '<div class="empty">Fehler beim Laden.</div>';
+    }
+  }
+
+  function renderGenreStats(rows){
+    const counts = {};
+    GENRE_ORDER.forEach(slug => { counts[slug] = 0; });
+    (rows || []).forEach(r => { counts[r.genre] = r.votes; });
+    const max = Math.max(1, ...Object.values(counts));
+    const container = el('genreStats');
+    if(!container) return;
+    container.innerHTML = GENRE_ORDER
+      .slice()
+      .sort((a, b) => counts[b] - counts[a])
+      .map(slug => `
+        <div class="genre-bar-row">
+          <span class="genre-bar-label">${escapeHtml(GENRE_LABELS[slug])}</span>
+          <span class="genre-bar-track"><span class="genre-bar-fill" style="width:${(counts[slug] / max * 100).toFixed(0)}%"></span></span>
+          <span class="genre-bar-count">${counts[slug]}</span>
+        </div>
+      `).join('');
+  }
+  // === GENRE-CHIPS: END ===
 
   function renderRows(rows){
     currentRows = rows;
