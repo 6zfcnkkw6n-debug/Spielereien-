@@ -126,7 +126,78 @@ body{
 .genre-label{ font-weight:700; font-size:14px; }
 .genre-example{ font-size:11px; color:var(--text-dim); }
 .genre-chip.active .genre-example{ color:var(--gold-light); }
+.genre-group{ display:flex; flex-direction:column; gap:8px; width:100%; }
+.genre-parent{
+  display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%;
+  background:rgba(255,255,255,0.04); border:1px solid var(--border); border-radius:12px;
+  padding:10px 14px; cursor:pointer; font-family:'Quicksand',sans-serif; color:var(--text);
+  transition:border-color .15s;
+}
+.genre-parent:hover{ border-color:var(--gold-light); }
+.genre-parent-text{ display:flex; flex-direction:column; align-items:flex-start; gap:2px; text-align:left; }
+.genre-chevron{ font-size:11px; color:var(--text-dim); transition:transform .2s; flex-shrink:0; }
+.genre-parent[aria-expanded="true"] .genre-chevron{ transform:rotate(180deg); }
+.genre-subgrid{ display:flex; flex-wrap:wrap; gap:8px; padding-left:14px; border-left:2px solid var(--border); }
+.genre-subgrid[hidden]{ display:none; }
+.genre-chip-sub{ padding:8px 12px; }
+.genre-chip-sub .genre-label{ font-size:13px; }
 /* === GENRE-CHIPS: END === */
+
+/* === WISH-CELEBRATION: START (leicht entfernbar) === */
+.wish-celebration{
+  position:fixed; inset:0; z-index:500; pointer-events:none;
+  display:flex; flex-direction:column; align-items:center;
+  opacity:0; visibility:hidden;
+}
+.wish-celebration.show{ opacity:1; visibility:visible; }
+.wc-rays{
+  position:absolute; top:6%; left:50%; width:520px; height:520px; margin-left:-260px;
+  background:conic-gradient(from 0deg,
+    transparent 0deg, rgba(240,215,152,.35) 6deg, transparent 14deg, transparent 40deg,
+    rgba(212,175,106,.28) 46deg, transparent 54deg, transparent 90deg, rgba(240,215,152,.3) 96deg,
+    transparent 104deg, transparent 150deg, rgba(212,175,106,.25) 156deg, transparent 164deg,
+    transparent 220deg, rgba(240,215,152,.3) 226deg, transparent 234deg, transparent 300deg,
+    rgba(212,175,106,.28) 306deg, transparent 314deg);
+  border-radius:50%; opacity:0; transform:scale(.4) rotate(0deg);
+}
+.wish-celebration.show .wc-rays{ animation: wc-rays-spin 1.9s ease-out forwards; }
+@keyframes wc-rays-spin{
+  0%{ opacity:0; transform:scale(.4) rotate(0deg); }
+  15%{ opacity:1; transform:scale(1) rotate(30deg); }
+  100%{ opacity:0; transform:scale(1.15) rotate(140deg); }
+}
+.wc-ball{ position:relative; margin-top:9%; transform:translateY(-160px); }
+.wish-celebration.show .wc-ball{ animation: wc-drop 1.9s cubic-bezier(.24,.86,.4,1.15) forwards; }
+@keyframes wc-drop{
+  0%{ transform:translateY(-160px); }
+  55%{ transform:translateY(14px); }
+  70%{ transform:translateY(2px); }
+  85%{ transform:translateY(8px); }
+  100%{ transform:translateY(-180px); }
+}
+.wc-ball-string{ width:2px; height:40px; background:var(--border); margin:0 auto; }
+.wc-ball-sphere{
+  position:relative; width:64px; height:64px; border-radius:50%; margin:0 auto;
+  background:repeating-conic-gradient(from 0deg, var(--gold-light) 0deg 9deg, var(--gold) 9deg 18deg);
+  box-shadow:0 0 30px rgba(240,215,152,.55), inset -6px -6px 14px rgba(0,0,0,.35), inset 6px 6px 10px rgba(255,255,255,.25);
+  animation: wc-ball-spin 2.6s linear infinite;
+}
+@keyframes wc-ball-spin{ to{ transform:rotate(360deg); } }
+.wc-ball-topper{ position:absolute; top:-22px; left:50%; transform:translateX(-50%); font-size:20px; line-height:1; }
+.wc-message{
+  margin-top:14px; font-family:'Anton',sans-serif; font-size:16px; letter-spacing:.03em;
+  color:var(--gold-light); text-transform:uppercase; text-shadow:0 2px 12px rgba(0,0,0,.5);
+  opacity:0; transform:translateY(6px);
+}
+.wish-celebration.show .wc-message{ animation: wc-message-in .5s ease .35s forwards; }
+@keyframes wc-message-in{ to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){
+  .wish-celebration.show .wc-rays{ display:none; }
+  .wc-ball-sphere{ animation:none; }
+  .wish-celebration.show .wc-ball{ animation:none; transform:translateY(0); margin-top:6%; }
+  .wish-celebration.show .wc-message{ animation:none; opacity:1; transform:none; }
+}
+/* === WISH-CELEBRATION: END === */
 .submit-btn{
   width:100%; background:transparent; border:1.5px solid var(--gold); color:var(--gold);
   font-family:'Anton',sans-serif; font-size:15px; letter-spacing:.05em; text-transform:uppercase;
@@ -188,6 +259,20 @@ body{
 <body>
 
 <div class="snowfield" id="snowfield"></div>
+
+<!-- WISH-CELEBRATION: START (leicht entfernbar) -->
+<div class="wish-celebration" id="wishCelebration" aria-hidden="true">
+  <div class="wc-rays"></div>
+  <div class="wc-ball">
+    <div class="wc-ball-string"></div>
+    <div class="wc-ball-sphere">
+      <div class="wc-ball-topper">🎄</div>
+    </div>
+  </div>
+  <div class="wc-message">🎶 Dein Wunsch ist im Rennen!</div>
+</div>
+<!-- WISH-CELEBRATION: END -->
+
 <div class="app">
   <div class="eyebrow"><span>❆</span> Live-Chart · Weihnachtsfest 17.12.</div>
   <h1 class="headline">Das Set<br><span class="accent">entsteht hier</span></h1>
@@ -422,8 +507,14 @@ body{
   const GENRE_SELECTED_KEY = 'weihnachtsfest-genre-selected';
   const GENRES = [
     { slug: 'charts_pop', label: 'Charts / Pop', example: 'Blinding Lights – The Weeknd' },
-    { slug: 'hiphop_rnb', label: 'Hip-Hop / R&B', example: 'Sicko Mode – Travis Scott' },
-    { slug: 'techno_edm', label: 'Techno / EDM', example: 'Losing It – Fisher' },
+    { slug: 'hiphop_rnb', label: 'Hip-Hop / R&B', example: 'Sicko Mode – Travis Scott', children: [
+        { slug: 'hiphop_trap', label: 'Hip-Hop & Trap', example: 'Rockstar – Post Malone ft. 21 Savage' },
+    ]},
+    { slug: 'electronic_dance', label: 'Electronic / Dance', example: 'Wake Me Up – Avicii', children: [
+        { slug: 'techno', label: 'Techno', example: 'Strobe – Deadmau5' },
+        { slug: 'house', label: 'House', example: 'One More Time – Daft Punk' },
+        { slug: 'tech_house', label: 'Tech House', example: 'Losing It – Fisher' },
+    ]},
     { slug: 'rock_alternative', label: 'Rock / Alternative', example: 'Mr. Brightside – The Killers' },
     { slug: 'schlager_party', label: 'Schlager / Party', example: 'Atemlos durch die Nacht – Helene Fischer' },
     { slug: 'retro_90s2000s', label: '90er / 2000er', example: 'Cotton Eye Joe – Rednex' },
@@ -449,18 +540,51 @@ body{
     localStorage.setItem(GENRE_SELECTED_KEY, JSON.stringify(Array.from(set)));
   }
 
+  function genreChipHtml(g, extraClass){
+    return `
+      <button type="button" class="genre-chip ${extraClass || ''}" data-genre="${g.slug}">
+        <span class="genre-label">${escapeHtml(g.label)}</span>
+        <span class="genre-example">z. B. ${escapeHtml(g.example)}</span>
+      </button>
+    `;
+  }
+
   function renderGenreGrid(){
     const grid = el('genreGrid');
     if(!grid) return;
     const selected = getSelectedGenres();
-    grid.innerHTML = GENRES.map(g => `
-      <button type="button" class="genre-chip ${selected.has(g.slug) ? 'active' : ''}" data-genre="${g.slug}">
-        <span class="genre-label">${escapeHtml(g.label)}</span>
-        <span class="genre-example">z. B. ${escapeHtml(g.example)}</span>
-      </button>
-    `).join('');
+
+    grid.innerHTML = GENRES.map(g => {
+      if(!g.children){
+        return genreChipHtml(g, selected.has(g.slug) ? 'active' : '');
+      }
+      const anyChildSelected = g.children.some(c => selected.has(c.slug));
+      return `
+        <div class="genre-group">
+          <button type="button" class="genre-parent" data-parent="${g.slug}" aria-expanded="${anyChildSelected}">
+            <span class="genre-parent-text">
+              <span class="genre-label">${escapeHtml(g.label)}</span>
+              <span class="genre-example">z. B. ${escapeHtml(g.example)}</span>
+            </span>
+            <span class="genre-chevron">▾</span>
+          </button>
+          <div class="genre-subgrid" data-subgrid="${g.slug}" ${anyChildSelected ? '' : 'hidden'}>
+            ${g.children.map(c => genreChipHtml(c, `genre-chip-sub ${selected.has(c.slug) ? 'active' : ''}`)).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+
     grid.querySelectorAll('.genre-chip').forEach(btn => {
       btn.addEventListener('click', () => toggleGenre(btn.getAttribute('data-genre'), btn));
+    });
+    grid.querySelectorAll('.genre-parent').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const subgrid = grid.querySelector(`.genre-subgrid[data-subgrid="${btn.getAttribute('data-parent')}"]`);
+        const expanded = btn.getAttribute('aria-expanded') === 'true';
+        btn.setAttribute('aria-expanded', String(!expanded));
+        subgrid.hidden = expanded;
+      });
     });
   }
 
@@ -480,6 +604,19 @@ body{
     btnEl.disabled = false;
   }
   // === GENRE-CHIPS: END ===
+
+  // === WISH-CELEBRATION: START (leicht entfernbar) ===
+  let celebrationHideTimer = null;
+  function celebrateWishSubmitted(){
+    const box = el('wishCelebration');
+    if(!box) return;
+    clearTimeout(celebrationHideTimer);
+    box.classList.remove('show');
+    void box.offsetWidth; // Reflow erzwingen, damit die Animation bei schnellem erneuten Trigger neu startet
+    box.classList.add('show');
+    celebrationHideTimer = setTimeout(() => box.classList.remove('show'), reduceMotion ? 1400 : 2100);
+  }
+  // === WISH-CELEBRATION: END ===
 
   function renderChart(){
     const listEl = el('chartList');
@@ -607,6 +744,7 @@ body{
       lastVotedId = row.id;
       await loadWishes();
       renderChart();
+      celebrateWishSubmitted(); // WISH-CELEBRATION
     }catch(e){
       showError('Konnte nicht gespeichert werden. Nochmal versuchen?');
     }
